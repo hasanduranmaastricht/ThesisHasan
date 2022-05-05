@@ -1,0 +1,567 @@
+---
+title: "Data Analytics"
+author: "Student Names and UM Numbers"
+date: "19/10/2020"
+output: 
+ html_document:
+   theme: flatly
+   toc: TRUE
+   toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE)
+```
+
+
+# Final Group Assignment 
+
+```{r, include=FALSE}
+getwd()
+```
+
+
+```{r, include=FALSE}
+library(outliers)
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(ggplot2)
+library(stargazer)
+library(robustHD)
+library(psych)
+library(summarytools)
+```
+
+## 1. Introduction
+
+Successful investing is about managing risk, not avoiding it (Benjamin Graham). According to the Economic Research (2016), distinctive elements explain why policymakers, trade persons, and financial markets pay specific concerns to the development of investments. In an influential article, Ed Bowsher (MoneyWeek, 2014) described that uncertainty has an enormous impact on investment behavior. Besides, Bowsher studied the area of Behavioral Finance for a long time. His studies show how emotions and psyches can affect our investments and describe the biases humans have where emotions/psychology can lead to bad investments. 
+
+The scope of this research is based on the Motor Vehicles and Passenger Car Bodies industry. This includes establishments primarily engaged in manufacturing or assembling complete passenger automobiles, trucks, commercial cars and buses, and particular purpose motor vehicles for highway use (Siccode, 2020). Moreover, this research is based on the Motor Vehicles and Passenger Car Bodies in the manufacturing division' final level. In this industry, 644 firms in the USA are classified with estimated employment of 53.450 employees (Siccode, 2020). Therefore, this research's problem statement is: *What drives investment behavior in the automotive industry?*. 
+
+First, the paper investigates the existing academic literature of what is and what is unknown and should identify trends, gaps, and controversies.  Second, it describes and summarizes the data in detail. Third, the methodology is discussed to describe the estimation technique(s) used to compute estimates of the models parameters. Third the results are given related to the original aims and objectives of the research. Finally, the implications and conclusions are given.
+
+
+## 2. Literature Review
+
+There are  many performance feedback variables that may be relevant in understanding *What is driving investment behavior?*
+
+*Investment behavior*
+Distinctive elements explain why policymakers, trade persons, and financial markets pay specific concerns to the development of investments (Economic Research, 2016). In recent years, several articles have been published, providing empirical evaluations of the pillars of investment. Findings of Bussière et al. (2015) show that investment depends on *GDP growth* (either realized or expected), an *uncertainty measure*, and the *cost capital*. *Uncertainty* is also essential, but the cost of capital measures less so.  Their analysis's main finding is ''that, on average over all the countries, *expected demand* always plays the largest role in explaining investment growth, while the contribution of *uncertainty* tends to become negative during recession periods'' (Bussière et al., 2015). 
+
+Besides, Ed Bowsher showed how emotions and psyches can affect investments and describes the biases humans have where emotions/psychology could lead to bad investments (MoneyWeek, 2014). First, loss aversion, which is the desire not to lose money. Loss aversion can lead to investment mistakes. Second, recency bias is the recency effect of an observational bias in which those units, designs, or proof that came last are remembered more clearly than those coming first (Freeman et al., 2011). Third, anchoring which is where investors anchor the whole investment on one particular factor, which excludes all the other company factors. 
+
+The Economic Research (2016) shows that the net investment as a firm factor becomes positive solely when a firm approaches integral volume and foresees further increases in the demand for its products. When *expected demand* no longer grows, the net investment will stop (The Economic Research, 2016). The neoclassical framework takes a different approach. It states that corporations will invest in an extra unit of capital to the extent that the extra output it creates (the marginal product of capital) is the same as the user cost of capital. When the user cost decreases, the wanted capital/output ratio enlarges. The *user cost* is influenced by the *level of interest rates*, *the depreciation rate*, and *taxes* (The Economic Research, 2016).
+
+Recent studies show different indicators that are relevant to study what drives investment behavior *in general*. For this research, several performance feedback variables may be *automotive preparations industry?* in particular. 
+
+*Performance Feedback Theory* 
+In their long-established declaration on organizational learning theory, Levitt and March (1988) discussed learning from direct experience (performance) and learning from the experience (performance) of others. Performance feedback theory has a central part in organizational learning theory because it combines these two sources of learning (Hodge et al., 2017). Performance indicators measure a firm's success vs. a set of aims, objectives, or industry companies (Ratio, 2017). * Performance indicators* can be financial (net profit, current ratio, etc.) or more informal (personnel retention, repeated clients, quality of customer participation, etc.). 
+
+*Historical Performance Feedback*
+Historical performance feedback of a corporation itself or similar corporations' performance is commonly considered the best options superiors have in establishing aspirations levels (Cyert and March, 1963).  
+
+According to Greve (2003) *research and development intensity* is the most direct organizational *historical performance feedback indicator* of search. The launch of innovations ends both from successful organizational exploration for varied behaviors and from managerial adoption of risk. Therefore this indicator is an excellent possibility to see how these processes work. Besides, research shows no clear description of high and low performance on the measures that superiors use to evaluate their firms, only rough rules of thumb. Superiors set their position for what level of performance is wanted (Greve, 2003). Such standards are called *aspiration levels*. Aspiration levels are effected by the firm's history and its rivals' performance. 
+
+As Greve (2003) mentioned, the research and development intensity is a direct organizational indicator of search. However, Viki ( Forbes, 2016) showed that R&D spending is not a perfect performance indicator for every industry. When it comes to R&D spending, corporate leaders often want to know what others are doing. How much are other companies in different industries spending on R&D. Leaders want to know the level of spending in absolute terms (i.e., total expenditure), and also as a percentage of revenue. Moreover, in an annual report of the top 1000 most innovative companies globally for over 12 years now (Jaruzelski et al., 2018), there is no statistically significant relationship between R&D spending on financial performance. Spending on R&D is not related to growth in sales or profits, increases in market capitalization, or shareholder returns. In every report that Jaruzelski et al. has published, the top 10 most innovative companies are rarely the top 10 spenders on R&D (Jaruzelski et al., 2018). In this top 10, most innovative companies are automotive companies included. It can be said that the R&D indicator is not the right fit for the researched industry. 
+ 
+
+*Social performance feedback*
+The social comparison-based aspiration level was originally determined as the difference between the prominent corporations' performance and the industry norm (Audia and Greve, 2006). It has shown that there is a relationship between performance inadequacy and a wide range of behaviors that reflect firms change - including change in the market position (Greve, 1998), investments in equipment (Audia and Greve, 2006), acquisitions (Iyer and Miller, 2008), divestments of defectively performing divisions (Greve, 2003), and R&D plans (Greve, 2003). Recent research strongly suggests that organizational performance aspirations depend on the main reference group most relevant to a corporations' performance rather than on all industry competitors (Blettner et al., 2015). Kuusela et al. (2017) set up a social comparison-based aspiration level by using a joined approach to identify the most relevant competing firms within each industry-year group (based on three-digit SIC codes) present in Compustat North America data. 
+
+
+## 3. Data Analysis
+
+**Data - describe and summarize the data in detail.**
+*Data*
+
+For this research, pre-existing structured archives are used. Pre-existing structured archives are data collection that is delegated to third-party providers. An advantage of using this is that it takes out much manually effort, data are neutral and less affected by the demands/preferences of one person, and standardization across users of the dataset allows replication to establish the robustness of any results found and facilitates cooperation (Vorst, 2020). 
+
+```{r}
+#Import Data Compustat
+da_compq <-data.table::fread("compustat.csv")
+str(da_compq)
+da_compq$datadate <- as.character(da_compq$datadate)
+da_compq$datadate <- as.Date(da_compq$datadate, "%Y%m%d")
+
+#Select Industry
+da_compq_autom <- filter(da_compq, sic == 3711)
+```
+
+The first pre-existing structured archives that are used are the Compustat (quarterly) data. Compustat contains financial statement data on most US publicly listed companies. This data contains public company financial data (such as R&D, net sales, Capex, assets, liabilities, and debt) across the years 2013-2018, which is the available last year of financial statement data. For this research, the automotive industry focuses on the dataset from Compustat (SIC 3711). In the Compustat, Automotive industry companies as Federal Signal Corporations, Ford Motor Corporations, and General Motors Corporations are included. 
+
+
+The original Compustat file had 9773 observations with 27 financial statement variables. After filtering for the automotive industry through the SIC 3711, the number of observations is now 680, whereby the variables have been retained. The str()-function in R detected that the time variable 'datadate' does not match the target format. For this reason, this variable was reformatted for consistency. 
+
+
+```{r}
+#Import Data CRSP
+da_crsp <-data.table::fread("crsp.csv")
+str(da_crsp)
+da_crsp$date <- as.Date(da_crsp$date, "%d%b%Y")
+names(da_crsp) [4] = "datadate"
+
+#Select Industry
+da_crsp_autom <- filter(da_crsp, sic == 3711)
+```
+
+The second pre-existing structured archives that are used is the monthly CRSP database. CRSP is the Center for Research in Security Prices and includes the most comprehensive US stock returns database. In particular, the CRSP database includes the monthly change in stock price (plus dividends), *i.e.*, monthly stock returns ("ret"), the monthly returns on a value-weighted index ("vwretd"), and the monthly returns on the S&P500 index ("sprtrn"). It further includes the company's fiscal year ("fyear") to which the returns relate, as well as the month that ends the fiscal year ("fyend"). For this research, the automotive industry focuses on the dataset of CRSP (SIC 3711), the same as the Compustat dataset. In the CRSP Automotive Industry, the same companies are included (like Federal Signal Corporations, Ford Motor Corporations, and General Motors Corporations). 
+
+The original CRSP dataset had 21,251 observations with nine variables before filtering for the automotive industry. The filter function has reduced the number of observations to 1097, while the number of variables has remained the same. The number of observations is higher than the Compustat dataset, as the CRSP dataset contains monthly information on stock data.
+
+There are challenges in combining CRSP and Compustat data. One of them is that both databases include different identifiers. CRSP uses an identifier known as a PERMNO to track stock issues, and PERMCO to track companies. Compustat uses an identifier known as a GVKEY to track companies, and a combination of GVKEY and IID is used to track securities. Moreover, both databases have different universes of data, different timeline of available historical information and different data conventions.  
+
+```{r}
+#Data Cleaning Compustat Before Merge
+da_compq_autom <- da_compq_autom %>% 
+   dplyr::select(-fyearq) %>%
+   dplyr::select(-fqtr)%>%
+   dplyr::select(-cusip)%>%
+   dplyr::select(-curcdq)%>%
+   dplyr::select(-`Cash - Q`)%>%
+   dplyr::select(-`Sales total - Q`)%>%
+   dplyr::select(-`Working Capital - Q`) %>%
+   dplyr::select(-`SG&A expense - Q`)%>%
+   dplyr::select(-`Capital expenditure - Y`)%>%
+   dplyr::select(-`Revenue total - Y`)%>%
+   dplyr::select(-`Sales total - Y`) %>%
+   dplyr::select(-`R&D expenditure - Y`)%>%
+   dplyr::select(-`SG&A expense - Y`)%>%
+   dplyr::select(-`state`)%>%
+   dplyr::select(-sic)
+
+#Data Cleaning CRSP Before Merge
+da_crsp_autom <- da_crsp_autom%>% 
+   dplyr::select(-fyear) %>%
+   dplyr::select(-fyend)%>%
+   dplyr::select(-comnam)%>%
+   dplyr::select(-sic)
+```   
+
+Before the two files are merged, a data cleaning is performed, which eliminates all variables not needed for further analysis so that a leaner and more transparent merge file is created. This also increases the processing speed when calculating and loading the data.
+
+```{r}
+#Create Variables In The Monthly Database Of CRSP Before The Merge
+
+#Create Variable = Average Stock Return Quarterly
+da_crsp_autom$averagestockreturnq <- ifelse(da_crsp_autom$gvkey==lag(da_crsp_autom$gvkey) &
+                                               lag(da_crsp_autom$gvkey,2),
+                                      (da_crsp_autom$ret+ lag(da_crsp_autom$ret) +
+                                          lag(da_crsp_autom$ret,2))/3,
+                                      NA)
+
+da_crsp_autom$averagespreturnq <- ifelse(da_crsp_autom$gvkey==lag(da_crsp_autom$gvkey) &
+                                               lag(da_crsp_autom$gvkey,2),
+                                      (da_crsp_autom$sprtrn+ lag(da_crsp_autom$sprtrn) +
+                                          lag(da_crsp_autom$sprtrn,2))/3,
+                                      NA)
+```
+
+Since the CRSP file contains monthly stock files, a merge of the CRSP file into the Compustat file would result in monthly data being compared with quarterly data. For this reason, variables/performance indicators needed for later analysis are created before the CRSP file is converted to a quarterly file. The variables created are the quarterly average stock return of each company, and the quarterly average SP500 return.
+
+```{r}
+#Merge CRSP Data Into Compustat
+da_merge <- left_join (da_compq_autom,
+                        da_crsp_autom,
+                        by= c("datadate", "gvkey"))
+```
+
+Now the data merge between the Compustat and CRSP data filtered by the automotive industry can be performed. The shared variables "datadate" and "gvkey" are selected as indicators for matching the data.
+
+```{r}
+#Summarize The Data
+print(dfSummary(da_merge), method = "render")
+```
+
+The figure above summarizes all descriptive statistics of the merge file variables, including the distribution and number of missing values. 
+
+If the financial statement dataset is examined, it can be seen that the means and medians are very different. This is due to the uneven distribution of observations and companies, as the dataset includes both substantial and small companies. 
+
+The most essential variables in this paper are the total quarterly revenue and the R&D expenses quarterly variables. The spread between the industry mean and median is also broad, as illustrated in the distribution chart. Besides, the variable contains 39 missing values (5.74%) from a total of 680 observations. The R&D expenses variable is also not normally distributed, as shown in the graph and in the average indicators. A unique aspect is that there is considerably less data on R&D expenses than on other financial statement data. In total, the dataset has 218 missing values, which corresponds to about 32.06% of the total observations.
+
+At first glance, the stock data from the CRSP dataset appear to be relatively normally distributed, although it should be emphasized that only about 35% of the observations were successfully matched, as the merge file records between 443 and 446 missing values per variable. This may be since the matching variable "datadate" did not always meet the same date in both datasets. 
+
+
+## 4. Methodology
+
+The automotive industry consists of a large range of companies and constitutes one of the most important market sectors. It is one of the largest sectors in terms of revenue (Maverick, J.B.  (2020). The industry accounted for nearly 3% of the U.S. GDP in 2018. Analysts and investors show that the current ratio is a general indicator employed to evaluate companies in the car industry. When the *current ratio* is in line with the industry average or slightly higher, it is generally considered acceptable (Ratio, 2017). Moreover, Gao et al. (2016) research show that the automotive revenue pool will significantly increase and diversity toward on-demand mobility services and data-driven services. This could create up to $1.5 trillion (30% more) in additional *revenue* potential in 2030 (Mewes, 2015). As showed, the automotive industry is a high-competitive market and revenue-driven.  Therefore, these are the most important historical performance  feedback indicators used for this research. However, to find the most fitting performance ratio, other financial indicators are investigated (like growth rate, debt to equity, etc.).  
+
+To further investigate the historical performance feedback, both the fixed- and random effects model (t-1) will be established to see how these indicators drive investment behavior in the automotive industry. A fixed- and random effect panel regression models will be run to compare the historical performance feedback from the current year to the previous year. Historical aspiration is defined as follows:  At = αPt−1 + (1 − α)At−1, where At denotes the aspiration level at time t, Pt-1 is the performance of the firm at time t-1, and A0 is defined solely by the performance for the first year in the data (Kuusela et al., 2017). Aspirations adjust to previous achievements (March and Simon, 1958), and the coefficient alpha denotes the relative importance of the previous aspiration level versus the actual prior performance as the current aspiration level. Larger alpha values indicate more rapid adjustments of aspiration levels based on feedback from actual performance, which should be expected in a dynamic sector (Joseph and Gaba, 2015). A shortcoming of historical comparison-based performance that must be mentioned is the absolute value of the difference between current performance and current aspiration (Kuusela et al., 2017)
+
+As Audia and Greve (2006) investigated, the industry average is used as an indicator to determine the social performance feedback indicator. 
+
+This investigation's research question is:*What drives investment behavior in R&D expenses the automotive industry?*. In both historical and social comparisons, the effect size and practical significance, converted to the regression coefficients are assessed. Since there is high competition in the automotive industry, reviewing the social performance feedback to see the industry average will be the main focus of this investigation. In some studies, R&D intensity is defined as a dependent variable to gain control over company size. However, since the automotive industry is diversified and there are many niche manufacturers, company size control is secondary and is ensured by control variables. For this reason, we choose R&D expenses as a dependent variable predicted by other variables.  
+
+
+####4.1 Performance Indicators
+
+In this section, various performance indicators are first created, which are later tested for their significance for the investment behavior in R&D expenses. For this purpose, the given variables from the Compustat and CRSP datasets are used.
+
+```{r}
+#Compustat Data
+da_merge$gvkey <- as.character(da_compq_autom$gvkey)
+#Rename Columns For Consistency
+names(da_compq_autom)
+
+names(da_merge) [5] = 'currentassetsq'
+names(da_merge) [6] = 'assetstotalq'
+names(da_merge) [7] = 'equityordinaryq'
+names(da_merge) [8] = 'longtermdebtq'
+names(da_merge) [9] = 'currentliabilitiesq'
+names(da_merge) [10] = 'liabilitiesq'
+names(da_merge) [11] = 'revenueq'
+names(da_merge) [12] = 'rdexpenseq'
+```
+
+```{r}
+#Revenue t-1
+da_merge$revenueq_t1 <- ifelse(da_merge$gvkey==lag(da_merge$gvkey),
+                                lag(da_merge$revenueq),
+                                NA)
+
+#Revenue t-2
+da_merge$revenueq_t2 <- ifelse(da_merge$gvkey==lag(da_merge$gvkey),
+                                lag(da_merge$revenueq,2),
+                                NA)
+```
+
+First, lag variables are created for the revenue. Specifically, lag variables are created for the points in time t_1 and t_2, as past data is often used, as current data is only available at the time of the quarterly financial statements. In order to keep control that only the warehouse variables from your own company are used for the calculation, they are coded using the ifelse function.
+
+```{r}
+#Plot ; X-Axis = Revenue Quarterly ; Y-Axis = R&D Expenses Quarterly
+ggplot(da_merge, aes(x=revenueq, y=rdexpenseq)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)
+```
+As can be seen in the graph above, a company's revenues appear to have a positive impact on R&D expenses. There are also some strong outliers that could influence a prediction model of investment behavior. A winsorizing of R&D expenses could bring the outliers into line with the overall picture.
+
+```{r}
+#Regression With No Winsorizing Of The Dependent Variable R&D
+regression.no_winsorizing <- lm(rdexpenseq ~ revenueq_t1, data = da_merge)
+
+#Winsorizing Of The Dependent Variable
+da_merge <- da_merge %>% 
+   mutate(rdexpenseq = winsor(rdexpenseq, 0.05))
+
+#Regression With Winsorizing Of The Dependent Variable R&D
+regression.winsorizing <- lm(rdexpenseq ~ revenueq_t1, data = da_merge)
+
+stargazer(regression.no_winsorizing, regression.winsorizing,  type = "text")
+```
+
+As seen in the above outcome, a winsorizing of R&D expenses by 5% improves the explanatory power of the overall model by more than 30% (R^2). In order to gain control over those companies that invest disproportionately in the development of new technologies, the winsorized variable will be used from now on. 
+
+```{r}
+#Current Ratio Quarterly
+da_merge$currentratioq <- ifelse(da_merge$gvkey==lag(da_merge$gvkey),
+                                  da_merge$currentassetsq/da_merge$currentliabilitiesq,
+                                  NA)
+```
+
+Secondly, variables are created for the financial slack, which provides control over companies in financial or economic distress. The current ratio of a company is often used in the literature to determine a financial slack, since it indicates the ratio of free resources to the liabilities of a company.
+
+```{r}
+#Long-Term Debt t-1
+da_merge$longtermdebtq_t1 <- ifelse(da_merge$gvkey==lag(da_merge$gvkey),
+                                  lag(da_merge$longtermdebtq),
+                                  NA)
+```
+
+Since research and development work is subject to a long process until new technologies are developed, they are financed with long-term debt at matching maturities. For this reason, long term debt is also used to explain and predict investment behavior in R&D.
+
+```{r}
+#Plot ; X-Axis = Revenue Quarterly ; Y-Axis = R&D Expenses Quarterly
+ggplot(da_merge, aes(x=longtermdebtq, y=rdexpenseq)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)
+```
+
+The above graph reinforces the idea that long term debt has an impact on R&D expenses and thus on investment behavior. The statistical proof will be examined at a later stage.
+
+
+####4.2 Benchmark Indicators
+
+```{r}
+#Firmaspiration t_0
+da_merge$firmaspiration_t0 <- ifelse((da_merge$revenueq - da_merge$revenueq_t1) >0 , 1 , 0)
+
+#Firmaspiration t_1
+da_merge$firmaspiration_t1 <- ifelse((da_merge$revenueq_t1 - da_merge$revenueq_t2) >0 , 1 , 0)
+```
+
+In this section the benchmark indicators are determined, which should serve as aspiration level for our model. As described in section 2, firm aspirations are created according to the performance feedback theory. The firm aspiration compares the revenues in t_0 (t_1) with the revenue level in t_1 (t_2) and is either 1 if the firm has overperformed its own past performance or 0 if the firm has underperformed. 
+
+```{r}
+#Plot ; X-Axis = R&D Expenses Quarterly ; Y-Axis = Firm Aspiration
+ggplot(da_merge, aes(x=rdexpenseq, y=firmaspiration_t0)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)
+```
+
+The graph above shows R&D expenses on the x-axis and firm aspiration on the y-axis.  It is a clear trend and influence to see that the performance of the previous quarter has a clear influence on the R&D expenses. Since the variable firm aspiration is binary and equals 1 if the company has overperformed and 0 if it has underperformed, there is a tendency to invest in R&D if the company has overperformed. 
+
+```{r}
+#Socialaspiration Industry Average
+
+#Mean Industry Level
+mean(da_merge$revenueq, na.rm = TRUE)
+
+#Median Industry Level
+median(da_merge$revenueq, na.rm = TRUE)
+
+#Create A Column For The Industrymedian
+da_merge$industrymedian <- median(da_merge$revenueq, na.rm = TRUE)
+
+#Socialaspiration t_0 Median
+da_merge$socialaspiration_t0.median <- ifelse((da_merge$revenueq - da_merge$industrymedian) >0 , 1 , 0)
+
+#Socialaspiration t_1 Median
+da_merge$socialaspiration_t1.median <- ifelse((da_merge$revenueq_t1 - da_merge$industrymedian) >0 , 1 , 0)
+```
+Next, a benchmark test with the industry average is performed to create a social aspiration, as described in section 2. Already during the data analysis we noticed that the revenue is not normally distributed and that some big players are driving the industry mean upwards. Therefore, as shown above, the median is the better choice, as this average value fits better to our dataset.  The revenue of each company is compared to the industry median and is equal to 1 if the company overperforms and 0 if it underperforms the industry average. 
+
+```{r}
+#Plot ; X-Axis = R&D Expenses Quarterly ; Y-Axis = Social Aspiration Industry Average
+ggplot(da_merge, aes(x=rdexpenseq, y=socialaspiration_t0.median)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)
+```
+
+The graph shows social aspiration on the y-axis and R&D expenses on the x-axis. It is clear to see that companies that outperform the industry average also tend to invest in R&D. For this reason, social aspiration for the industry average seems to be suitable to form a prediction model. This will be examined again in a later section.
+
+```{r}
+#Socialaspiration SP500
+
+#Socialaspiration t_0
+da_merge$socialaspiration_t0.SP <- ifelse((da_merge$averagestockreturnq - da_merge$averagespreturnq) >0 , 1 , 0)
+
+#Socialaspiration t_1
+da_merge$socialaspiration_t1.SP <- ifelse((da_merge$averagestockreturnq - da_merge$averagespreturnq) >0 , 1 , 0)
+```
+
+The final benchmark is the social aspiration between the average stock return of the last three months (quarterly) of the individual companies and the quarterly performance of the SP500. It is tested whether the company performs better or weaker than the market, as a possible assumption may be that the market reacts quickly and provides information that is not apparent from the financial balance sheet data.
+
+```{r}
+#Plot ; X-Axis = R&D Expenses Quarterly ; Y-Axis = Social Aspiration Market Average
+ggplot(da_merge, aes(x=rdexpenseq, y=socialaspiration_t0.SP)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)
+```
+
+The graph above shows the distribution of over- and underperforming companies based on their quarterly stock returns over the quarterly returns of the SP500. The social aspiration based on stock market data shows that no clear distribution can be seen, indicating that the stock market data is not useful in a model that predicts and explains the investment behavior in R&D expenses. However, this will be statistically tested again at a later stage.
+
+
+####4.3 Hypothesis 
+
+The automotive industry is a revenue and quantity driven industry. Also, many producers are active in niche markets, making sales one of the most significant performance indicators. Since only past data is available, only the past period should be considered to predict the investment behavior. For this reason, the following hypothesis can be stated:
+
+H1: The higher the revenues in the previous quarter, the more companies will invest in R&D 
+
+A lack of resources could deter companies from investing. For this reason, a financial slack is often associated with an aversion to investment. On the other hand, the tendency to realize investment projects increases if resources are available in sufficient quantities, which is why the following hypothesis can be stated:
+
+H2: Companies that have a financial slack tend to invest less in R&D
+
+Since research and development are highly capital-intensive and generally require a long-term success process, these investments are naturally financed with funds at matching maturities. Long-term debt could therefore be an indicator for the investment behavior of companies in R&D, and the following hypothesis can be drawn:
+
+H3: Companies with high long-term debt tend to invest more in R&D
+
+If a company overperforms its own past revenue performance, i.e. firm aspiration, this is often a signal for positive corporate development. Thus, if the operating business is stable and profitable with positive future prospects, investments tend to be made earlier, which is why the following hypothesis can be stated:
+
+H4: If the company performs better than in previous periods, a tendency towards higher R&D investments can be seen
+
+Even if the company performs better than the industry average, this benchmark indicates that the company is stable overall. Therefore, the following hypothesis can be made with respect to social aspiration based on the industry average:
+
+H5: If the company has performed better than the industry average in the past, the company tends to invest more in R&D
+
+As the stock market generally allows few information asymmetries and the share price generally reflects the state of the company or expected future profits, a conclusion could be drawn saying that companies that outperform the market, even in difficult periods, are generally stable. For this reason, the following hypothesis can be derived:
+
+H6: If the company's stock has performed better than the market, the company tends to invest more in R&D
+
+The R&D expenses were determined as a suitable dependent variable. First, H1 is tested in a simple linear regression (regression.1), using the previous quarter's revenue to explain the future investment behavior in R&D.  The previous quarter's revenues were selected because at time t_0 usually the financial statement data is not available and the previous period represents a more realistic approach. To test the H2, the current ratio of the companies is added to the model (regression.2) as a control variable to isolate the effect of financial slack, since the hypothesis is that companies with few resources tend to invest less in R&D. The model (regression.3) is then extended by the covariate long-term debt, which is used to provide a meaningful response to the H3. In order to test H4-H6, the aspiration levels will be included in the model (regression.4; regression.5; regression6) separately for each level and finally analyzed by using individual, the time fixed and random panel regressions, which are intended to eliminate bias and provide an isolated view of the model. 
+
+## 5. Results
+
+```{r}
+#Simple Linear Regression; Dependent Variable = rdexpenseq; Independent Variable = revenue:t_1
+regression.1 <- lm(rdexpenseq ~ revenueq_t1, data = da_merge)
+
+#Multiple Linear Regression; Dependent Variable = rdexpenseq; Independent Variable = revenue:t_1; Control Variable = cuurrentratioq
+regression.2 <- lm(rdexpenseq ~ revenueq_t1 + currentratioq, data = da_merge)
+
+#Multiple Linear Regression; Dependent Variable = rdexpenseq; Independent Variable = revenue:t_1; Control Variable = cuurrentratioq; Covariate = longtermdebtq_t1
+regression.3 <- lm(rdexpenseq ~ revenueq_t1 + currentratioq + longtermdebtq_t1, data = da_merge)
+
+#Multiple Linear Regression; Dependent Variable = rdexpenseq; Independent Variable = revenue:t_1; Control Variable = cuurrentratioq; Covariate = longtermdebtq_t1 ; Variable = firmaspiration_t1
+regression.4 <- lm(rdexpenseq ~ revenueq_t1 + currentratioq + longtermdebtq_t1 +
+                      firmaspiration_t1, data = da_merge)
+
+#Multiple Linear Regression; Dependent Variable = rdexpenseq; Independent Variable = revenue:t_1; Control Variable = cuurrentratioq; Covariate = longtermdebtq_t1 ; Variable = socialaspiration_t1.median
+regression.5 <- lm(rdexpenseq ~ revenueq_t1 + currentratioq + longtermdebtq_t1 +
+                      socialaspiration_t1.median, data = da_merge)
+
+#Multiple Linear Regression; Dependent Variable = rdexpenseq; Independent Variable = revenue:t_1; Control Variable = cuurrentratioq; Covariate = longtermdebtq_t1 ; Variable = socialaspiration_t1.SP
+regression.6 <- lm(rdexpenseq ~ revenueq_t1 + currentratioq + longtermdebtq_t1 +
+                   socialaspiration_t1.SP, data = da_merge)
+
+stargazer(regression.1,regression.2,regression.3,regression.4,regression.5,regression.6, type = "text")
+```
+The above table provides the results of the linear regression models.
+
+The simple linear regression between the revenues from t_1 has a significant coefficient of 0.045 for each additional unit of revenue. The significant overall model also has a high F-statistic of 1989.13, which indicates a good fit of the model. The explanatory power is 82.7%, which explains a msignificant portion of the overall variance. Therefore, the H1 hypothesis can be confirmed, as companies with high revenues in the past tend to invest in R&D. 
+
+The second model introduces the current ratio of the company as a control variable for the financial slack. The input variables are independent of each other and do not correlate. Thus the assumption of the independence of the covariate is given. The overall model is also significant here, although the F-value has decreased by almost 1000 compared to the previous model. However, the adjusted explanatory power (R^2) has increased by 2%, which indicates that investment behavior can be predicted more accurately by detecting and controlling for a financial slack. The coefficient of the current ratio is positive, which indicates that a high current ratio, i.e. the availability of resources, positively affects on investment behavior, even if it is relatively low at 1,814. This corresponds to the H2 that companies with financial slack have aversions to investments in R&D. 
+
+The third model integrates the company's long-term debt into the model. It can be seen that the overall p-value is still significant, and the F-statistic, although it has again decreased by about 300, is still sufficient and shows a positive fit in the model. In addition, the adjusted explanatory power R^2 again increased by 1%, in contrast to the pre-model. Compared to the pre-model, the revenue coefficient has decreased slightly after the longterm debt was added to the model and the coefficient for the current ratio is now negative. This may indicate that some parts of the revenues are financed by long-term debt and the amount therefore has a direct influence on the variable. One possible explanation would be that revenue-generating machines are financed with long-term debt. That the coefficient of the current ratio is now negative could be due to the fact that R&D investments are preferably financed with long-term debt and not from free resources. This would argue against H2, but confirm H3. The significant variable long-term debt has a positive coefficient with 0.012 more investments in R&D for each additional long-term debt unit. 
+
+The fourth model introduces the firm aspiration into the model at time t_1. The binary variable serves to create a benchmark for the individual company based on its past revenues. As seen in the outcome, the overall model is significant, with a sufficient F-statistic of 539.7. the adjusted R^2 is now at 86.1% and has the highest explanatory power of all models. Surprisingly, if the company overperforms its own past benchmark, this has a negative effect on R&D investment, which is -141.742, but significant. This implies that overperforming companies tend to invest less, which argues against the H4. 
+
+In the fifth model, the firm aspiration variable is replaced by a social aspiration variable, namely the binary benchmark comparison between firm performance and the industry average. The model has an almost identical explanatory power and significance as the pre-model. The coefficients of all other variables show only slight changes compared to the pre-model and remain positively correlated with R&D investments. The only difference to the pre-model is that an overperformance of the company in terms of revenues compared to the industry average has a positive influence on the investment behavior. On average, overperforming companies spend $128,906 more on R&D than underperforming companies. This supports the H5, which states that companies that outperform the industry average also invest more in R&D. 
+
+The sixth model considers an alternative social aspiration based on the stock data of the considered companies in the benchmark compared to the market performance of the SP500. Compared to all models, this model has the lowest adjusted explanatory power (adj. R^2 81.6) and by far the lowest F-value of 114,222. The significance of the overal model is mainly driven by the variable revenueq_t1 and longtermdebtdebtq_t1. The benchmark comparison coefficient is also insignificant, which is why the H0 for this variable cannot be rejected. Contrary to the defined H6, a benchmark comparison based on stock data does not seem suitable to explain the investment behavior in R&D. 
+
+
+```{r}
+library(plm)
+```
+
+The plm package is activated at this stage of work to process panel data, as an earlier activation would cause a collision with other package functions. For example, this package will also affect the lag() function. 
+
+The models of choice are therefore the models 4 (firm aspiration) and 5 (social aspiration industry average). These models provide the greatest explanatory power and significance and thus best explain the investment behavior of firms in R&D. Since the data set is a longtable, panel regressions can also be performed. By applying individual and time fixed effects, differences in the cross-sectional units or differences in time can be separated from bias and thus allow a analysis free of influences of unobserved variables. Also random effects models can and will be performed in the course of the work. The Hausman test is used to determine which of the panel regression models should be the model of choice. 
+
+
+```{r}
+#Panel Regressions
+
+#Firmaspiration
+
+#Create Panel Data
+da_merge_panel.1 <- pdata.frame(da_merge , 
+                           index=c("gvkey","datadate"))
+#Individual Effects Model
+regression.1.fixed <- plm(rdexpenseq ~ revenueq_t1 + currentratioq + firmaspiration_t1 , data = da_merge_panel.1, model = 'within')
+
+#Random Effects Model
+regression.1.random <- plm(rdexpenseq ~ revenueq_t1 + currentratioq + firmaspiration_t1 , data = da_merge_panel.1, model = 'random')
+
+stargazer(regression.1.fixed,regression.1.random, type = "text")
+
+#Run the Hausman test ; inputs: regression.q1c.fixed ; regression.q1c.random
+phtest(regression.1.fixed,regression.1.random)
+```
+In the following, the fourth model with the variable firmaspiration_t1 is examined using panel regression models. 
+
+In the individual effects model both the current ratio as the firm aspiration do not have a significant relationship. The R^2 explains only 1.34% of the total variance, while the adjusted value is even negative, because the fixed effects model considers the crossectional units as dummies to create a model free of bias. Due to the high number of companies, the R^2 is negatively affected. The total sum of squares is high, so this model is not very representative (much variation). 
+
+The random effects model shows that there is a significant  relationship of both the firm aspiration and the revenue towards the R&D expenditure. The firm aspiration shows to have a negative effect on the R&D expenses. Moreover, the fit of the model is better than with the fixed effects model, with a score of 0.189. 
+
+In the Hausman test the prior discussed was investigated, fixed and random effect panel regression models. The test excludes whether the fixed or random effect panel regression models are the more appropriate model for further analysis. The Hausman test shows that there is an significant p-value of <2.2e-16. This indicates, that the fixed effects panel regression model is the model of choice, because the cross-sectional units seem to be correlated with the predictors.
+
+```{r}
+#The individual and time fixed effects model. We assume that there is an observed homogeneity across cross-sectional units (we expect an observed differences). 
+regression.1.twoways <- plm(rdexpenseq ~ revenueq_t1 + currentratioq + firmaspiration_t1 , data = da_merge_panel.1, model = "within" , effect = "twoways")
+summary(regression.1.twoways)
+
+stargazer(regression.1.twoways, type = "text")
+```
+
+Since the Hausman test states that the fixed effects model is the model of choice, the twoways model also eliminates the differences in the time of bias. The overall p-value of the model is 0.69538, so it is not significant. The H0 hypothesis for this model can be accepted. This indicates, that as we concluded before, the fixed effects model is more precise in predicting the R&D expenses than with both the random-effects model and the two-ways model for the historical aspiration.
+
+```{r}
+#Panel Regressions
+
+#Socialaspiration Industry Average
+
+#Individual Effects Model
+regression.2.fixed <- plm(rdexpenseq ~ revenueq_t1 + currentratioq + socialaspiration_t1.median , data = da_merge_panel.1, model = 'within')
+
+#Random Effects Model
+regression.2.random <- plm(rdexpenseq ~ revenueq_t1 + currentratioq + socialaspiration_t1.median , data = da_merge_panel.1, model = 'random')
+
+#Run the Hausman test ; inputs: regression.q1c.fixed ; regression.q1c.random
+phtest(regression.2.fixed,regression.2.random)
+```
+Next, the fifth model, which includes the benchmark comparison with the industry average (socialaspiration_t1_median), is examined in panel regression models.
+
+In the individual fixed effects model both the revenue, the social aspiration as the current ratio do not have a significant relationship toward the R&D expenses. The R-squared is very low, with a score of 0.021802, so there is a low fit to the model. The total sum of squares is high, so this model is not very representative (much variation). 
+
+The random effects model shows that there is a significant  relationship of both the social aspiration and the revenue towards the R&D expenditure. The social aspiration shows to have a high positive effect on the R&D expenses. Moreover, the fit of the model is better than with the fixed effects model, with a score of 0.17888. 
+
+The Hausman test shows that there is an significant p-value of <2.2e-16. This indicates, that the fixed effects panel regression model is the model of choice, because the cross-sectional units seem to be correlated with the predictors.
+
+```{r}
+#The individual and time fixed effects model. We assume that there is an observed homogeneity across cross-sectional units (we expect an observed differences). 
+regression.2.twoways <- plm(rdexpenseq ~ revenueq_t1 + currentratioq + socialaspiration_t1.median , data = da_merge_panel.1, model = "within" , effect = "twoways")
+summary(regression.2.twoways)
+
+stargazer(regression.2.twoways, type = "text")
+```
+
+
+The overall p-value of the model is 0.21334, so it is not significant. The H0 hypothesis for this model can be accepted This indicates, that as concluded before, the fixed effects model is more precise in predicting the R&D expenses than with both the random-effects model and the two-ways model for the social aspiration.
+
+
+## 6. Implications and Conclusion
+
+This investigation's research question was:*What drives investment behavior in R&D expenses the automotive industry?*. 
+
+Our empirical findings suggest an explanation of the investment behavior in R&D of market participants from the automotive industry. From our initial six hypotheses, empirical evidence was found to support at least three of them. One of the main drivers for R&D investment is the size of revenue and the level of long-term debt. 
+
+This was determined by the formulation of suitable hypotheses and models. H1, which states that the higher the revenue in the previous quarter, the more investments are made in R&D, was demonstrated in various models. The positive impact of the revenue in the previous quarter is significant. This could be due to the fact that managers do not like to rely on past performance and are motivated to differentiate themselves from their competitors by developing the most advanced technologies. Another explanation could be that budgets become free due to higher revenues in the past and that these budgets are also invested in R&D. Nonetheless, companies often use budgetary plans that allocate a pre-formulated portion of their revenues to investment strategies. Thus, an artificial correlation could influence the model but still helps explain companies' investment in R&D.
+
+The initial idea was to use the current ratio as an indicator for the model' financial slack. This ratio provides an indication for the availability of resources in companies, which was associated with a possible influence on the investment behavior in the context of this elaboration. The basic idea was that companies are aversive to investments in R&D when few resources are available. Despite this indicator's statistical insignificance, it could still give control over at least some economically distressed firms that might otherwise have worsened the model. However, our sample contains relatively stable players from the automotive industry listed in the world's most extensive indices. If the sample would be extended by many more small firms, the current ratio and the financial slack could have a statistically significant influence again, which is unlikely according to our preliminary results. 
+
+
+The long term debt has a significant positive relationship on R&D investments. This confirms our initial H3. It is possible that companies that already have a debt are not risk-averse towards investing in R&D because it might have a positive effect on e.g., the sales/total revenue. Furthermore, long-term debt could indicate that current long-term R&D projects are financed with long-term capital at matching maturities. This could be a possible explanation for increased investment behavior in R&D in the automotive industry. Further research might take a look if companies might take (short-term) extra debt to invest in R&D and how much R&D has a positive effect on the company outcomes. 
+
+The fourth hypothesis (H4) assumes that companies that outperform their own past performance tend to invest in R&D. This hypothesis could not be confirmed in our models, although firm aspiration showed statistical significance in the models. However, the impact on R&D investments was negative, which may be because managers who outperform their performance several times in a row tend to rest on their achievements. Another explanation could be that managers first want to exploit the cash flows from new technologies before starting large-scale R&D investments. This would imply that R&D investments may be cyclical and could provide opportunities for further study of the investment behavior in R&D in the automotive industry. However, such behavior could jeopardize a fundamental success factor, such as technological advantage, in the long term. Private benefits of the manager or other investment considerations could also be a factor. 
+
+In contrast to the H4, the social aspiration benchmark comparison with the industry average can confirm the H5. If the company outperforms the market, there is a positive and significant correlation to R&D expenses. Companies that do not outperform the industry average are not likely to invest much in R&D. Companies that do outperform have higher R&D expenses.This could indicate that companies that invest a lot in R&D also perform better than the market because they have a technological advantage over their competitors. 
+
+Research has shown that the companies stock indicator is not an explanatory indicator to see if companies are more likely to invest more into R&D if the companies stock has performed better than the market. These results indicate that the hypothesis is not supported, suggesting that automotive companies do not use this indicator as an explanatory indicator for R&D investments. Thus, manager's implication could be to invest in R&D to be more successful than the industry average in the long run. 
+
+Overall, our findings merely indicate the drivers of investment behavior in R&D expenses in the automotive industry. It shows that there is a general tendency to R&D investments when sales increase. However, this is a logical conclusion, as the automotive industry is a mainly revenue- and volume-driven industry. However, high investments in R&D also ensure that revenues remain at a consistently high level in the long term. The fact that long-term debt has a significant influence on the investment behavior in R&D might also be the result of managers making the financially correct decision to match the maturities of the development of new technologies and their financing. It can also be concluded that companies that outperform the market invest more in R&D than companies that underperform. Thus, the investment behavior of companies could be derived from their performance.
+
+## 7. References:
+
+Audia, P. G., & Greve, H. R. (2006). Less likely to fail: Low performance, firm size, and factory expansion in the shipbuilding industry. Management science, 52(1), 83-94.
+
+Blettner, D. P., He, Z. L., Hu, S., & Bettis, R. A. (2015). Adaptive aspirations and performance heterogeneity: Attention allocation among multiple reference points. Strategic Management Journal, 36(7), 987-1005.
+
+Bussiere, M., Ferrara, L., & Milovich, J. (2015). Explaining the recent slump in investment: the role of expected demand and uncertainty.
+
+Cyert, R. M., & March, J. G. (1963). A behavioral theory of the firm. Englewood Cliffs, NJ, 2(4), 169-187.
+
+Ed Bowsher (2014) Behavioural Finance: How psychology can affect investors - MoneyWeek Videos. Retrieved from:  https://www.youtube.com/watch?v=vRmwgMpnDuE
+
+Gao, P., Kaas, H. W., Mohr, D., & Wee, D. (2016). Disruptive trends that will transform the auto industry. McKinsey & Company, 1(January), 1-9.
+
+Greve, H. R. (1998). Performance, aspirations, and risky organizational change. Administrative Science Quarterly, 58-86.
+
+Greve, H. R. (2003). A behavioral theory of R&D expenditures and innovations: Evidence from shipbuilding. Academy of management journal, 46(6), 685-702.
+
+Hodge, G. A., & Greve, C. (2017). On public–private partnership performance: A contemporary review. Public Works Management & Policy, 22(1), 55-78.
+Investipedia (2020). Retrieved from https://www.investopedia.com/terms/k/kpi.asp#:~:text=Key%20performance%20indicators%20(KPIs)%20measure,(liquidity%20and%20cash%20availability).
+
+Iyer, D. N., & Miller, K. D. (2008). Performance feedback, slack, and the timing of acquisitions. Academy of Management Journal, 51(4), 808-822.
+
+Jaruzelski, B., Chwalik, R., & Goehle, B. (2018). What the top innovators get right. strategy+ business, 93.
+
+Kuusela, P., Keil, T., & Maula, M. (2017). Driven by aspirations, but in what direction? Performance shortfalls, slack resources, and resource‐consuming vs. resource‐freeing organizational change. Strategic management journal, 38(5), 1101-1120.
+
+Levitt, B., & March, J. G. (1988). Organizational learning. Annual review of sociology, 14(1), 319-338.
+
+Maverick, J.B.  (2020) Key Financial Ratios Analyze Automotive Industry. Retrieved from:  https://www.investopedia.com/articles/active-trading/082015/key-financial-ratios-analyze-automotive-industry.asp 
+
+Mewes, B.  (2015) Six Critical KPIs That Drive Business Value in the Automotive Aftermarket Industry. Retrieved from:  https://www.divestopedia.com/2/7383/maximize-value/financial-metrics/six-critical-kpis-that-drive-business-value-in-the-automotive-aftermarket-industry 
+
+Ratio, C. (2017). Investopedia. URL: https://www. investopedia. com/terms/c/currentratio. asp.
+Siccode, 2020. SIC Code 2834 – Motor Vehicles and Passenger Car Bodies. Retrieved from: https://siccode.com/sic-code/3711/motor-vehicles-passenger-car-bodies 
+The Economic Research (2016). What is driving corporate investment?  Retrieved from https://economic-research.bnpparibas.com/Views/DisplayPublication.aspx?type=document&IdPdf=29177 
+
+Viki, T. (2016). Why R&D spending is not a measure of innovation. Forbes. August, 21, 2016.
+
+W. Jerry Chisum, Jodi Freeman, in Crime Reconstruction (Second Edition), 2011
