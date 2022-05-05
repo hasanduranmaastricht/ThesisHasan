@@ -28,73 +28,72 @@ data_STOXXEUROPE600 <- read_excel('STOXXEUROPE600BONDS.xlsx', sheet = 'Tab1')
 
 #Split Dataframe In Subdataframes of Quarters
 create_base_data_set <- function(total_data_set){ # Create Dataset Without Quarter Columns
-  df <- as.data.frame(total_data_set)
-  df[, -grep("20", colnames(df))]
+  df <- as.data.frame(total_data_set) #Create Data Frame Structure For Easier Processing
+  df[, -grep("20", colnames(df))] #Clear Strings That Include "20" In Columnnames
 }
 
-
 #Create Dataset With Function create_base_data_set
-base_data_set <- create_base_data_set(data_STOXXEUROPE600) 
+base_data_set <- create_base_data_set(data_STOXXEUROPE600) #Create Base Dataset With All Columns That Do Not Include "20"
 
 
 create_quarter_data_set <- function(data, Quarter){ # Create Dataset For Each Quarter
-  df <- as.data.frame(data)
-  df <- df[, grep(Quarter, colnames(df))]
+  df <- as.data.frame(data) #Create Data Frame Structure For Easier Processing
+  df <- df[, grep(Quarter, colnames(df))] #Include Strings That Include "Quarter" In Columnnames
   # Rename Columnames By Removing  Quarter Identifier From The Names 
-  old_col_names <- colnames(df)
-  new_col_names <- stringr::str_remove(old_col_names, paste0("_", Quarter))
+  old_col_names <- colnames(df) #Copy Old Columnnames To Keep Original Dataset 
+  new_col_names <- stringr::str_remove(old_col_names, paste0("_", Quarter)) #Remove Everything After "_"
   
   #Unique Identifier: Use The Issue Symbol
   unique_identifier_issueSymbol <- data$Issue_Symbol 
   
   colnames(df) <- new_col_names
-  df$Quarter <- Quarter
-  df <- cbind(df, unique_identifier_issueSymbol)
-  df # Return the final dataset
+  df$Quarter <- Quarter #Create New Column With The Respective Quarters From Line 39 (Function Argument 2)
+  df <- cbind(df, unique_identifier_issueSymbol) #Merge Unique Identifier To The Quarter Datasets For Merging Purposes
+  df # Return The Final Dataset
   
 }
 
 
 #Create Quarter Datasets
-dataset_Q12014 <- create_quarter_data_set(data_STOXXEUROPE600, '2014Q1')
-dataset_Q22014 <- create_quarter_data_set(data_STOXXEUROPE600, '2014Q2')
-dataset_Q32014 <- create_quarter_data_set(data_STOXXEUROPE600, '2014Q3')
-dataset_Q42014 <- create_quarter_data_set(data_STOXXEUROPE600, '2014Q4')
+dataset_Q12014 <- create_quarter_data_set(data_STOXXEUROPE600, '2014Q1') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q22014 <- create_quarter_data_set(data_STOXXEUROPE600, '2014Q2') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q32014 <- create_quarter_data_set(data_STOXXEUROPE600, '2014Q3') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q42014 <- create_quarter_data_set(data_STOXXEUROPE600, '2014Q4') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
 
-dataset_Q12015 <- create_quarter_data_set(data_STOXXEUROPE600, '2015Q1')
-dataset_Q22015 <- create_quarter_data_set(data_STOXXEUROPE600, '2015Q2')
-dataset_Q32015 <- create_quarter_data_set(data_STOXXEUROPE600, '2015Q3')
-dataset_Q42015 <- create_quarter_data_set(data_STOXXEUROPE600, '2015Q4')
+dataset_Q12015 <- create_quarter_data_set(data_STOXXEUROPE600, '2015Q1') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q22015 <- create_quarter_data_set(data_STOXXEUROPE600, '2015Q2') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q32015 <- create_quarter_data_set(data_STOXXEUROPE600, '2015Q3') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q42015 <- create_quarter_data_set(data_STOXXEUROPE600, '2015Q4') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
 
-dataset_Q12016 <- create_quarter_data_set(data_STOXXEUROPE600, '2016Q1')
-dataset_Q22016 <- create_quarter_data_set(data_STOXXEUROPE600, '2016Q2')
-dataset_Q32016 <- create_quarter_data_set(data_STOXXEUROPE600, '2016Q3')
-dataset_Q42016 <- create_quarter_data_set(data_STOXXEUROPE600, '2016Q4')
+dataset_Q12016 <- create_quarter_data_set(data_STOXXEUROPE600, '2016Q1') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q22016 <- create_quarter_data_set(data_STOXXEUROPE600, '2016Q2') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q32016 <- create_quarter_data_set(data_STOXXEUROPE600, '2016Q3') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q42016 <- create_quarter_data_set(data_STOXXEUROPE600, '2016Q4') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
 
-dataset_Q12017 <- create_quarter_data_set(data_STOXXEUROPE600, '2017Q1')
-dataset_Q22017 <- create_quarter_data_set(data_STOXXEUROPE600, '2017Q2')
-dataset_Q32017 <- create_quarter_data_set(data_STOXXEUROPE600, '2017Q3')
-dataset_Q42017 <- create_quarter_data_set(data_STOXXEUROPE600, '2017Q4')
+dataset_Q12017 <- create_quarter_data_set(data_STOXXEUROPE600, '2017Q1') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q22017 <- create_quarter_data_set(data_STOXXEUROPE600, '2017Q2') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q32017 <- create_quarter_data_set(data_STOXXEUROPE600, '2017Q3') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q42017 <- create_quarter_data_set(data_STOXXEUROPE600, '2017Q4') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
 
-dataset_Q12018 <- create_quarter_data_set(data_STOXXEUROPE600, '2018Q1')
-dataset_Q22018 <- create_quarter_data_set(data_STOXXEUROPE600, '2018Q2')
-dataset_Q32018 <- create_quarter_data_set(data_STOXXEUROPE600, '2018Q3')
-dataset_Q42018 <- create_quarter_data_set(data_STOXXEUROPE600, '2018Q4')
+dataset_Q12018 <- create_quarter_data_set(data_STOXXEUROPE600, '2018Q1') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q22018 <- create_quarter_data_set(data_STOXXEUROPE600, '2018Q2') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q32018 <- create_quarter_data_set(data_STOXXEUROPE600, '2018Q3') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q42018 <- create_quarter_data_set(data_STOXXEUROPE600, '2018Q4') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
 
-dataset_Q12019 <- create_quarter_data_set(data_STOXXEUROPE600, '2019Q1')
-dataset_Q22019 <- create_quarter_data_set(data_STOXXEUROPE600, '2019Q2')
-dataset_Q32019 <- create_quarter_data_set(data_STOXXEUROPE600, '2019Q3')
-dataset_Q42019 <- create_quarter_data_set(data_STOXXEUROPE600, '2019Q4')
+dataset_Q12019 <- create_quarter_data_set(data_STOXXEUROPE600, '2019Q1') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q22019 <- create_quarter_data_set(data_STOXXEUROPE600, '2019Q2') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q32019 <- create_quarter_data_set(data_STOXXEUROPE600, '2019Q3') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q42019 <- create_quarter_data_set(data_STOXXEUROPE600, '2019Q4') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
 
-dataset_Q12020 <- create_quarter_data_set(data_STOXXEUROPE600, '2020Q1')
-dataset_Q22020 <- create_quarter_data_set(data_STOXXEUROPE600, '2020Q2')
-dataset_Q32020 <- create_quarter_data_set(data_STOXXEUROPE600, '2020Q3')
-dataset_Q42020 <- create_quarter_data_set(data_STOXXEUROPE600, '2020Q4')
+dataset_Q12020 <- create_quarter_data_set(data_STOXXEUROPE600, '2020Q1') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q22020 <- create_quarter_data_set(data_STOXXEUROPE600, '2020Q2') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q32020 <- create_quarter_data_set(data_STOXXEUROPE600, '2020Q3') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q42020 <- create_quarter_data_set(data_STOXXEUROPE600, '2020Q4') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
 
-dataset_Q12021 <- create_quarter_data_set(data_STOXXEUROPE600, '2021Q1')
-dataset_Q22021 <- create_quarter_data_set(data_STOXXEUROPE600, '2021Q2')
-dataset_Q32021 <- create_quarter_data_set(data_STOXXEUROPE600, '2021Q3')
-dataset_Q42021 <- create_quarter_data_set(data_STOXXEUROPE600, '2021Q4')
+dataset_Q12021 <- create_quarter_data_set(data_STOXXEUROPE600, '2021Q1') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q22021 <- create_quarter_data_set(data_STOXXEUROPE600, '2021Q2') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q32021 <- create_quarter_data_set(data_STOXXEUROPE600, '2021Q3') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
+dataset_Q42021 <- create_quarter_data_set(data_STOXXEUROPE600, '2021Q4') #Use Function (Argument 1 = Dataset; Argument 2 = Year Quarter I Want To Extract)
 
 
 #Bind Quarter Datasets Into Cleaned Dataset With Quarter Stacked
@@ -880,7 +879,6 @@ cleanDataIssue <- cleanDataIssue  %>%
   select(-'IssueDaysToMaturity')%>%  
   select(-'EBITDA') 
 cleanDataIssue <-cleanDataIssue[!is.na(cleanDataIssue$IssueQuarter),]
-
 
 ##################################################################################
 
@@ -1866,7 +1864,7 @@ summary(cleanDataCOVIDIssue$Quarter)
 cleanDataCOVIDIssue$Shock1 <- ifelse(cleanDataCOVIDIssue$Quarter == '2020Q1', 1,0)
 cleanDataCOVIDIssue$Shock2 <- ifelse(cleanDataCOVIDIssue$Quarter == '2020Q1', 1,ifelse(cleanDataCOVIDIssue$Quarter == '2020Q2', 1,0))
 cleanDataCOVIDIssue$Shock3 <- ifelse(cleanDataCOVIDIssue$Quarter == '2020Q1', 1,ifelse(cleanDataCOVIDIssue$Quarter == '2020Q2', 1,ifelse(cleanDataCOVIDIssue$Quarter == '2020Q3', 1,0)))
-
+cleanDataIssueCOVIDT <-cleanDataCOVIDIssue
 
 #Count Firms
 length(unique(cleanDataCOVIDIssue$CUSIP))
@@ -2471,3 +2469,168 @@ modelsummary(RShock3ESGLag)
 RShock3Lag <-feols(lnIssueIntSpreadToTreasury ~ LagE + LagS + LagG + Shock3 +I(ESGOverallStd*Shock3)+ lnIssueAmount + IssueYearsToMaturity + Call_Flag  + AltmanZClass + TobinsQ + Volatility + Leverage + InterestCoverage + Loss + ROA + Size + WC + Index | NAICS + Year , data = cleanDataCOVIDIssue)
 summary(RShock3Lag)
 modelsummary(RShock3Lag)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#COVID DEFENSE
+cleanDataIssueCOVIDT$ESGOverallStdQuant <- ntile(cleanDataIssueCOVIDT$ESGOverallStd, 4) 
+cleanDataIssueCOVIDT$ESGOverallStdQuant<-ifelse(cleanDataIssueCOVIDT$ESGOverallStdQuant ==4, 'Quant4', ifelse(cleanDataIssueCOVIDT$ESGOverallStdQuant ==3, 'Quant3', ifelse(cleanDataIssueCOVIDT$ESGOverallStdQuant==2, 'Quant2', ifelse(cleanDataIssueCOVIDT$ESGOverallStdQuant==1,'Quant1', NA))))
+cleanDataIssueCOVIDT$ESGOverallStdQuant <- as.factor(cleanDataIssueCOVIDT$ESGOverallStdQuant)
+summary(cleanDataIssueCOVIDT$ESGOverallStdQuant)
+
+
+cleanDataIssueCOVIDT$LagESGOverallStdQuant <- ntile(cleanDataIssueCOVIDT$LagESGOverallStd, 4) 
+cleanDataIssueCOVIDT$LagESGOverallStdQuant<-ifelse(cleanDataIssueCOVIDT$LagESGOverallStdQuant ==4, 'Quant4', ifelse(cleanDataIssueCOVIDT$LagESGOverallStdQuant ==3, 'Quant3', ifelse(cleanDataIssueCOVIDT$LagESGOverallStdQuant==2, 'Quant2', ifelse(cleanDataIssueCOVIDT$LagESGOverallStdQuant==1,'Quant1', NA))))
+cleanDataIssueCOVIDT$LagESGOverallStdQuant <- as.factor(cleanDataIssueCOVIDT$LagESGOverallStdQuant)
+summary(cleanDataIssueCOVIDT$LagESGOverallStdQuant)
+
+
+cleanDataIssueCOVIDT$EQuant <- ntile(cleanDataIssueCOVIDT$E, 4) 
+cleanDataIssueCOVIDT$EQuant<-ifelse(cleanDataIssueCOVIDT$EQuant ==4, 'Quant4', ifelse(cleanDataIssueCOVIDT$EQuant ==3, 'Quant3', ifelse(cleanDataIssueCOVIDT$EQuant==2, 'Quant2', ifelse(cleanDataIssueCOVIDT$EQuant==1,'Quant1', NA))))
+cleanDataIssueCOVIDT$EQuant <- as.factor(cleanDataIssueCOVIDT$EQuant)
+summary(cleanDataIssueCOVIDT$EQuant)
+
+
+cleanDataIssueCOVIDT$LagEQuant <- ntile(cleanDataIssueCOVIDT$LagE, 4) 
+cleanDataIssueCOVIDT$LagEQuant<-ifelse(cleanDataIssueCOVIDT$LagEQuant ==4, 'Quant4', ifelse(cleanDataIssueCOVIDT$LagEQuant ==3, 'Quant3', ifelse(cleanDataIssueCOVIDT$LagEQuant==2, 'Quant2', ifelse(cleanDataIssueCOVIDT$LagEQuant==1,'Quant1', NA))))
+cleanDataIssueCOVIDT$LagEQuant <- as.factor(cleanDataIssueCOVIDT$LagEQuant)
+summary(cleanDataIssueCOVIDT$LagEQuant)
+
+
+cleanDataIssueCOVIDT$SQuant <- ntile(cleanDataIssueCOVIDT$S, 4) 
+cleanDataIssueCOVIDT$SQuant<-ifelse(cleanDataIssueCOVIDT$SQuant ==4, 'Quant4', ifelse(cleanDataIssueCOVIDT$SQuant ==3, 'Quant3', ifelse(cleanDataIssueCOVIDT$SQuant==2, 'Quant2', ifelse(cleanDataIssueCOVIDT$SQuant==1,'Quant1', NA))))
+cleanDataIssueCOVIDT$SQuant <- as.factor(cleanDataIssueCOVIDT$SQuant)
+summary(cleanDataIssueCOVIDT$SQuant)
+
+
+cleanDataIssueCOVIDT$LagSQuant <- ntile(cleanDataIssueCOVIDT$LagS, 4) 
+cleanDataIssueCOVIDT$LagSQuant<-ifelse(cleanDataIssueCOVIDT$LagSQuant ==4, 'Quant4', ifelse(cleanDataIssueCOVIDT$LagSQuant ==3, 'Quant3', ifelse(cleanDataIssueCOVIDT$LagSQuant==2, 'Quant2', ifelse(cleanDataIssueCOVIDT$LagSQuant==1,'Quant1', NA))))
+cleanDataIssueCOVIDT$LagSQuant <- as.factor(cleanDataIssueCOVIDT$LagSQuant)
+summary(cleanDataIssueCOVIDT$LagSQuant)
+
+
+cleanDataIssueCOVIDT$GQuant <- ntile(cleanDataIssueCOVIDT$G, 4) 
+cleanDataIssueCOVIDT$GQuant<-ifelse(cleanDataIssueCOVIDT$GQuant ==4, 'Quant4', ifelse(cleanDataIssueCOVIDT$GQuant ==3, 'Quant3', ifelse(cleanDataIssueCOVIDT$GQuant==2, 'Quant2', ifelse(cleanDataIssueCOVIDT$GQuant==1,'Quant1', NA))))
+cleanDataIssueCOVIDT$GQuant <- as.factor(cleanDataIssueCOVIDT$GQuant)
+summary(cleanDataIssueCOVIDT$GQuant)
+
+
+cleanDataIssueCOVIDT$LagGQuant <- ntile(cleanDataIssueCOVIDT$LagG, 4) 
+cleanDataIssueCOVIDT$LagGQuant<-ifelse(cleanDataIssueCOVIDT$LagGQuant ==4, 'Quant4', ifelse(cleanDataIssueCOVIDT$LagGQuant ==3, 'Quant3', ifelse(cleanDataIssueCOVIDT$LagGQuant==2, 'Quant2', ifelse(cleanDataIssueCOVIDT$LagGQuant==1,'Quant1', NA))))
+cleanDataIssueCOVIDT$LagGQuant <- as.factor(cleanDataIssueCOVIDT$LagGQuant)
+summary(cleanDataIssueCOVIDT$LagGQuant)
+
+
+#Count Firms
+length(unique(cleanDataIssueCOVIDT$CUSIP))
+
+
+###########################################################
+
+
+levels(cleanDataIssueCOVIDT$ESGOverallStdQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+#Bind Dummy To ESG Overall Quant
+contrasts(cleanDataIssueCOVIDT$ESGOverallStdQuant) <- cbind(Quant2, Quant3, Quant4)
+R8.cleanDataIssueCOVIDT <- feols(lnIssueIntSpreadToTreasury ~ ESGOverallStdQuant + lnIssueAmount + IssueYearsToMaturity + Call_Flag + AltmanZClass + TobinsQ + Volatility + Leverage + InterestCoverage + Loss + ROA + Size + WC + Index | NAICS + Year , data = cleanDataIssueCOVIDT)
+summary(R8.cleanDataIssueCOVIDT)
+modelsummary(R8.cleanDataIssueCOVIDT)
+
+
+summary(cleanDataIssueCOVIDT$EQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+contrasts(cleanDataIssueCOVIDT$EQuant) <- cbind(Quant2, Quant3, Quant4)
+summary(cleanDataIssueCOVIDT$SQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+contrasts(cleanDataIssueCOVIDT$SQuant) <- cbind(Quant2, Quant3, Quant4)
+summary(cleanDataIssueCOVIDT$GQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+contrasts(cleanDataIssueCOVIDT$GQuant) <- cbind(Quant2, Quant3, Quant4)
+R9.cleanDataIssueCOVIDT <- feols(lnIssueIntSpreadToTreasury ~ EQuant + SQuant + GQuant + lnIssueAmount + IssueYearsToMaturity + Call_Flag +  AltmanZClass + TobinsQ + Volatility + Leverage + InterestCoverage + Loss + ROA + Size + WC + Index | NAICS + Year , data = cleanDataIssueCOVIDT)
+summary(R9.cleanDataIssueCOVIDT)
+modelsummary(R9.cleanDataIssueCOVIDT)
+
+
+levels(cleanDataIssueCOVIDT$ESGOverallStdQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+#Bind Dummy To ESG Overall Quant
+contrasts(cleanDataIssueCOVIDT$ESGOverallStdQuant) <- cbind(Quant2, Quant3, Quant4)
+R10.cleanDataIssueCOVIDT <- feols(lnIssueIntSpreadToTreasury ~ ESGOverallStdQuant + Shock1 + lnIssueAmount + IssueYearsToMaturity + Call_Flag + AltmanZClass + TobinsQ + Volatility + Leverage + InterestCoverage + Loss + ROA + Size + WC + Index | NAICS + Year , data = cleanDataIssueCOVIDT)
+summary(R10.cleanDataIssueCOVIDT)
+modelsummary(R10.cleanDataIssueCOVIDT)
+
+
+summary(cleanDataIssueCOVIDT$EQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+contrasts(cleanDataIssueCOVIDT$EQuant) <- cbind(Quant2, Quant3, Quant4)
+summary(cleanDataIssueCOVIDT$SQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+contrasts(cleanDataIssueCOVIDT$SQuant) <- cbind(Quant2, Quant3, Quant4)
+summary(cleanDataIssueCOVIDT$GQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+contrasts(cleanDataIssueCOVIDT$GQuant) <- cbind(Quant2, Quant3, Quant4)
+R11.cleanDataIssueCOVIDT <- feols(lnIssueIntSpreadToTreasury ~ EQuant + SQuant + GQuant + Shock1+ lnIssueAmount + IssueYearsToMaturity + Call_Flag +  AltmanZClass + TobinsQ + Volatility + Leverage + InterestCoverage + Loss + ROA + Size + WC + Index | NAICS + Year , data = cleanDataIssueCOVIDT)
+summary(R11.cleanDataIssueCOVIDT)
+modelsummary(R11.cleanDataIssueCOVIDT)
+
+
+
+levels(cleanDataIssueCOVIDT$ESGOverallStdQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+#Bind Dummy To ESG Overall Quant
+contrasts(cleanDataIssueCOVIDT$ESGOverallStdQuant) <- cbind(Quant2, Quant3, Quant4)
+R12.cleanDataIssueCOVIDT <- feols(lnIssueIntSpreadToTreasury ~ ESGOverallStdQuant + Shock1 + I(ESGOverallStd*Shock1) + lnIssueAmount + IssueYearsToMaturity + Call_Flag + AltmanZClass + TobinsQ + Volatility + Leverage + InterestCoverage + Loss + ROA + Size + WC + Index | NAICS + Year , data = cleanDataIssueCOVIDT)
+summary(R12.cleanDataIssueCOVIDT)
+modelsummary(R12.cleanDataIssueCOVIDT)
+
+
+summary(cleanDataIssueCOVIDT$EQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+contrasts(cleanDataIssueCOVIDT$EQuant) <- cbind(Quant2, Quant3, Quant4)
+summary(cleanDataIssueCOVIDT$SQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+contrasts(cleanDataIssueCOVIDT$SQuant) <- cbind(Quant2, Quant3, Quant4)
+summary(cleanDataIssueCOVIDT$GQuant)
+Quant2 <- c(0,1,0,0)
+Quant3 <- c(0,0,1,0)
+Quant4 <- c(0,0,0,1)
+contrasts(cleanDataIssueCOVIDT$GQuant) <- cbind(Quant2, Quant3, Quant4)
+R13.cleanDataIssueCOVIDT <- feols(lnIssueIntSpreadToTreasury ~ EQuant + SQuant + GQuant + Shock1 + I(ESGOverallStd*Shock1) +  lnIssueAmount + IssueYearsToMaturity + Call_Flag +  AltmanZClass + TobinsQ + Volatility + Leverage + InterestCoverage + Loss + ROA + Size + WC + Index | NAICS + Year , data = cleanDataIssueCOVIDT)
+summary(R13.cleanDataIssueCOVIDT)
+modelsummary(R13.cleanDataIssueCOVIDT)
+
+
+###########################################################
