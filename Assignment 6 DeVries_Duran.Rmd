@@ -1,0 +1,344 @@
+---
+title: "Data Analytics | Assignment VI"
+author: "Laura de Vries, i6225254 ; Hasan Duran, i6259382"
+date: "15/10/2020"
+output: 
+ html_document:
+   theme: flatly
+   toc: TRUE
+   toc_float: TRUE
+---
+
+# Week 7:
+
+"You can't manage what you don't measure!" In the assignment this week we will be looking at two methods for analyzing big data and discussing the appropriateness of these methods for managers. We provide access to alternative sources of data which are often used in Big Data for machine learning prediction analysis and sentiment analysis of social media data.
+
+In the first part of the assignment we are going to work with survival data from the Titanic and look at the probability of survival. In the second part we will look at some sentiment analysis from a topical political topic using some recent Tweets.  
+
+```{r}
+#Check working directory
+getwd()
+```
+
+```{r}
+#Activate all packages needed
+library(tm)
+library(RColorBrewer)
+library(wordcloud)
+library(readtext)
+library(dplyr)
+library(tidyverse)
+library(dplyr)
+library(summarytools)
+library(sjPlot)
+library(afex)
+library(emmeans)
+library(psych)
+library(car)
+library(readr)
+library(readxl)
+library(dplyr)
+library(interactions)
+library(stargazer)
+library(syuzhet)
+library(gplots)
+library(margins)
+library(tm)
+library(SnowballC)
+```
+
+_____
+# Part I
+
+#### **For Part I of the assignment, we are going to work with the Titanic dataset, see Varian (2014).** 
+
+## Question 1. 
+
+#### Estimate a Linear Probability Model for age on the binary dependent variable ‘survive’ in **R**. Interpret your results for age on survival during the Titanic disaster. Compare your results to Table 3 in the Varian (2014) paper. Does the LPM model suffer from heteroskedasticity? 
+
+```{r}
+#Import data and review 
+titanic <- read.csv("titanic3.csv", na.strings="")
+str(titanic)
+names(titanic)
+View(titanic)
+```
+
+```{r}
+#Run the regression and summarize
+regression.q1 <- lm(survived ~ age , data = titanic)
+summary(regression.q1)
+```
+In the linear probability model above, a regression was performed to determine whether age affects the probability of survival. In the outcome the coefficient 'age' is -0.001894, which means that there is a negative linear relationship between age and survival probability.  With every additional year of life, the probability of surviving the tragedy decreases by 0.1894%. The average probability of survival when age is kept constant is 46.48%, as shown in the intercept. Overall, the model describes an overall variance of 0.31%, but has a high F-statistic of 3227. the p-value of 0.07272 is significant at the 90% level. Since the dependent variable 'survived' is a binary variable, the residual standard error is about 0.5, which is a sign that heteroskedasticity is present. The linear probability model suffers from heteroskedasticity because the distribution of error terms is either 1-betaX or -betaX. The Our result is the same as in Varians paper. 
+
+```{r}
+#Plot the regression
+ggplot(titanic, aes(x=age, y=survived)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)
+```
+
+## Question 2. 
+#### A guiding principle in evacuation is to help the vulnerable first; was this the case for those who survived in the Titanic tragedy - what is the probability of survival for women and children? In the paper, Varian states a revision of that principal, _“women and children first . . . particularly if they were traveling first class.”_ What is the probability of those travelling in the lower class (Pclass) of surviving?
+
+```{r}
+#Show characters of the variables
+str(titanic)
+
+#Factorize sex variable
+titanic$sex <- as.factor(titanic$sex)
+
+#Create new variable for children and factorize it
+titanic$children <- ifelse(titanic$age <= 12 , 'TRUE', 'FALSE')
+titanic$children <- as.factor(titanic$children)
+
+#Create new variable for first class passengers 
+titanic$firstclass <- ifelse(titanic$pclass==1, 'TRUE', 'FALSE')
+```
+After the 'sex' variable has been factorized, a new variable 'children' is created using the ifelse function, in which children of <= 12 years of age should be filtered out. In addition, a new variable is created for the firstclass passengers, in which all other passenger classes are not considered. 
+
+```{r}
+#Show levels of children and sex to know which observation is used as baseline
+levels(titanic$children)
+levels(titanic$sex)
+levels(titanic$firstclass)
+
+#Run the regression and summarize
+regression.q2 <- lm(survived ~ sex + children + firstclass, data = titanic) 
+summary(regression.q2)
+```
+The output above shows the regression between the binary dependent variable 'survived' and the independent variables sex, children and firstclass. 
+
+If we first look at the variable 'sex', it becomes clear that men have a 51.017% worse chance to survive than women. 
+
+The result of the regression for children shows that children up to 12 years have on average a 19.185% higher chance of survival than other age groups.
+
+It is also clear that passengers in the first class have a significantly higher chance of survival than passengers in the other classes, namely by 26.533%. 
+
+The highest chances of survival in this model are therefore for females under 12 years of age in first class.
+
+probability of survival = 0.63987(b_0) - 0.51017*0(b_1) + 0.19185(b_2) + 0.26533(b_3) = 1.09705
+
+In this case the probability would be over 100%, which of course makes no sense in our case. Besides it is very difficult to actually meet a 100% probability in reality. This also shows one of the weaknesses of the linear probability model, because some individuals are over- or undervalued in comparison. Rather, the probability should be asymmetrically close to 0% and 100%.
+
+Question 3. Rather than assume a linear effect of age on survival, can anything be learned by using age groups on the probability of survival? Note: Use the _ifelse_ statement to create age factors. For example, define children as less 12 and under. Teenages as 13 until 19, young adults between 20 and 35, and middle aged as 36-55, and elderly as above 56 (for the sake of argument!)
+
+```{r}
+# Define children, teenagers, young adults, middle aged and elderly
+titanic$agegroups <- ifelse(titanic$age <= 12 , 'children', 
+                            ifelse(titanic$age >=13 & titanic$age <=19, 'teenagers', 
+                                   ifelse(titanic$age >=20 & titanic$age <=35, 'youngadults',
+                                          ifelse(titanic$age >=36 & titanic$age <=55, 'middleaged' , 
+                                                 ifelse(titanic$age >=56, 'elderly', NA)))))
+titanic$agegroups <- as.factor(titanic$agegroups)
+
+
+
+#Define children
+titanic$children <- ifelse(titanic$age <= 12 , 'TRUE', 'FALSE')
+
+#Define teenagers
+titanic$teenagers <- ifelse(titanic$age >=13 & titanic$age <=19, 'TRUE', 'FALSE')
+
+#Define young adults
+titanic$youngadults <- ifelse(titanic$age >=20 & titanic$age <=35, 'TRUE', 'FALSE')
+
+#Define middle aged
+titanic$middleaged <- ifelse(titanic$age >=36 & titanic$age <=55, 'TRUE', 'FALSE')
+
+#Define elderly
+titanic$elderly <- ifelse(titanic$age >=57, 'TRUE', 'FALSE')
+```
+
+First, age groups are defined to find out if certain age groups had a higher fraction of survival than others. Children are defined as observations that are 12 or younger. Teenagers are those between 13 and 19 years of age, while young adults are identified as 20 to 35 years old. Observations that are between 36 and 55 years of age are considered middleaged and those over 56 are classified as elderly. 
+
+```{r}
+#Run the regression
+#regression.q3.1 <- lm(survived ~ agegroups, data = titanic)
+#summary(regression.q3.1)
+
+regression.q3.2 <- lm(survived ~ children + teenagers + youngadults + middleaged + elderly, data = titanic)
+summary(regression.q3.2)
+```
+The outpot of regression allows a ranking as shown above. The oldest passengers with (40%-8.5185% =) 31.48% have the lowest chances of survival in our sample, followed by the young adults with 38.88%. The third highest chances of survival are for teenagers with 39.7% and middel aged passengers with 41.07% had the second highest chances to survive the demise of the titanic. Children under the age of 12 had the highest chances of survival at 57.45%.
+
+```{r}
+#Plot the means of probability of survival
+plotmeans(survived ~ agegroups, data=titanic)
+```
+The above shown plot shows the means of the survival rate of each pre defined age group. It visualizes the prior discussed analysis. 
+
+Question 4. Compare the results of the Linear Probability Model (LPM) using OLS for the Titanic survival data, which has a binary dependent variable (survive or not survive), to a logit model, which is a binomial regression model, and allows for a nonlinear relationship. The logit model is widely used in Machine Learning, for prediction. It is estimated using the generalized linear model function (glm). The exponent of the coefficients gives us the log odds ratios. 
+**[Hint]** Create an academic styled table using the _stargazer_ package with the regression results from the 3 OLS regressions and the 3 Logit regressions. 
+
+
+
+```{r}
+#Run the logit regression for regression.q1 
+regression.q4.q1 <- glm(survived ~ age , data = titanic , binomial(logit))
+
+#Run the logit regression for regression.q2
+regression.q4.q2 <- glm(survived ~ sex + children + firstclass, data = titanic, binomial(logit)) 
+
+#Run the logit regression for regression.q3 
+regression.q4.q3 <- glm(survived ~ children + teenagers + youngadults + middleaged + elderly , data = titanic , binomial(logit))
+```
+To allow a nonlinear relationship between the dependent and independent variables, the regressions from question one to three are converted into a logit model using the glm-function, i.e. a binomial regression model. 
+
+```{r}
+#Build academic styled table 
+stargazer(regression.q1, regression.q4.q1, regression.q2 , regression.q4.q2 , regression.q3.2 , regression.q4.q3, type = "text")
+```
+This table provides us the result of the LPM regressions as well as the Logit Model regressions. The exponent of the coefficients of the glm functions give us the log odds ratio, which are difficult to interpret.
+
+For this we use the 'margins' function.
+
+```{r}
+#Marginal effect age ; logit regression
+margins(regression.q4.q1)
+
+#Marginal effect age ; logit regression
+margins(regression.q4.q2)
+
+#Marginal effect age ; logit regression
+margins(regression.q4.q3)
+```
+Regression 1
+Marginal effect of age: -0.001902214 (similar to linear probability model)
+
+Regression 2
+Average effect of male: -0.5107377 (similar to linear probability model)
+Average effect of children: 0.1816951 (similar to linear probability model)
+Average effect of firstclass: 0.2647279 (similar to linear probability model)
+
+Regression 3
+Average effect of children: 0.1739673 (0.70557 in the linear probability model)
+Average effect of teenagers: -0,003035001 (-0.01274 in the linear probability model)
+Average effect of young adults: -0.01121019 (-0.04699 in the linear probability model)
+Average effect of middle aged: 0.01055198 (0.04417 in the linear probability model)
+Average effect of elderly: -0.08550374 (-0.37224 in the linear probability model)
+
+Now the interpretations of the coefficients are similar to the linear probability model. The biggest difference is, that the glm function allows non-linear relationships, as well as the set of assumptions, where more assumptions hold true for the logit model than for the LPM model.
+
+## Question 5.
+#### From Figure 4 in the Varian (2014) paper, evaluate how well the ctree indicates how the variables gender, age and sibling and spouses effect the chances of survival. [You do not need to do this empirically].
+
+The ctree for survivors of the Titanic from figure 3 of Varian's paper shows the path-dependent survival probabilities for passengers. First, the model distinguishes between the variable 'sex' (i.e. females and males) and then distinguishes for both observations according to the variable 'pclass', i.e. whether the passengers were placed in the first or other classes. Within the observation male there is further specification, but we will go into this in a moment. 
+
+For the path sex = female + pclass <=2 there is a 90% probability to survive this in the ctree model by eyeballing. In our regression.q2 we have analyzed similar things, but we only considered the firstclass passengers.  The probability was about 90.52% in our analysis, so we agree with the ctree. In the next part the passenger classes >2 are considered. By eyeballing the ctree shows a 50% chance of survival for such passengers. In our analysis the chance of survival for women from all classes, except the first class, was 63.99%. Since we also included the second class, which probably had a higher chance of survival than the lower classes, the result of the ctree seems to be within the range.
+
+In the path 'male' the ctree differentiate again between age classes, after the 'pclass' was used. At first we go into the first class. There age groups of <= 54 and >54 were formed. It can be seen that men younger than 54 years old who belonged to the first class at the time of the catastrophe have a chance of survival of 40%, while older men from the first class have a rather low chance of survival of about 10%. In the path 'male' the ctree differentiate again between age classes, after the 'pclass' was used. At first we go into the first class. There age groups of <= 54 and >54 were formed. It can be seen that men younger than 54 years old who belonged to the first class at the time of the catastrophe have a chance of survival of 40%, while older men from the first class have a rather low chance of survival of about 10%. The results from our regression.q3.1 already gave us an indication that older men over 56 have only a chance of survival of about 18.15%. There are only two years between our observation and the one from the ctree and furthermore one should think that older men from the first class have a higher chance of survival than in our analyzed regression, in which older men from all classes were considered. For this reason we consider the number from the ctree to be suspect. For men under 54 years of age, we roughly agree with the ctree observation.
+
+In the path for males and a lower class than the first, the ctree distinguishes between children from 0 to 9 years and passengers older than 9. In the outcome for the children, the ctree again distinguishes between children with a maximum of two siblings and children with more than two siblings. It is clear to see that the children have a higher chance of survival than all others. This is of course also due to the fact that there were explicit orders to save women and children first. But what you can see in the ctree is that children with more than two siblings have a much lower chance of survival, which is almost zero. This may be because the families were probably too big to accommodate everyone on the boat, but also because the family did not want to split up may have promoted this outcome as long as they decided to sink with the titanic together rather than board the lifeboats separately. 
+
+_____
+
+_____
+
+# Part II
+
+#### **For part II of the assignment, we are going to work with Twitter data to analysize tweets.** 
+
+## Question 1. 
+#### What are the drawbacks of using traditional OLS methods (General Linear Model and Linear Probability Model) for estimation and prediction?
+
+One issue with the OLS methods is the error distribution (heteroskedasticity). When we do a OLS, we assume that the variance is normal distributed (mean of 0 and a constant variance). However in order to compute the error term of the empricial model, the dependent variable is either 1 or 0. The error term is a function of X. The distribution of the error term is not normally distributed, and the errors are correlated with the explanatory variable. Heteroskedasticity means that the variance of the error term is not constant (zero). This problem does not change the values of the estimates of the paramter (there is no bias in the estimate parameters), however it leads to an inconstent estimatation in the error distribution variance. The variances are not estimated correctly. Moreover, since the estimated standard errors are based directly on that variance, the ones resported in the tables are no longer valid for constructing confidence interval, t-statistic and f-tests. We can solve this problem by using the robusted estimates (like WLS,ML, GMM) (Pownall, 2020).
+
+Another problem of that in some cases the linear probability model can predict probabilities larger than 1 or smaller than 0. This problem can be solved by logistic regression models such as LOGIT or PROBIT (Pownall, 2020).
+
+The last issue is that the assumption of linearity. The interpretation of marginal and average effects is only valid if the model is well-specified. But this many not be in the case. You can test this by the REST test (Pownall, 2020).
+
+## Question 2. 
+#### Describe other types of non-linear methods (as mentioned in Varian and the lecture).
+
+Different variables alow for different methods being used to analyse the data. 
+1. Decision Trees: Classification and Regression Trees (CART models). Method that classifies the data, and with forecasting in a diagram. The advantage is that it picks up some linearity in the data (Maastricht University, 2020).
+2. Penalised Regression Models: LASSO, LARS, and elastic nets. Is an alternative of the OLS model, with big data you have many different variables. LARS function includes some penalty for the number of explanatory variables. However this also introduces complexity with different variables and is therefore in means of incorporating the cost of this complexity, if we using this additional cost in regression models with LASSO and LARS (but also decision trees) (Maastricht University, 2020).
+3. Random Forests, uses multiple linear models. You use bootstrapping, creating more data, using randomaziation The disadvantage is that you heavenly dependent on the inittial sample  in the randomazation proces (uses more data) (Maastricht University, 2020). 
+4.Neural networks, Deep Learning & Support Vector machines, this is available in the machine learning text (Vian, 2014 )
+
+## Question 3. 
+#### In the data file _press.debate_ you will find a list of tweets. Use the _wordcloud_ package to create a wordcloud in R. 
+
+```{r}
+#Loading in the dataset
+press.debate <- readtext("Press_Debate.txt")
+View(press.debate)
+
+#Create a vector containing only the text
+text <- press.debate$text
+```
+
+#Now we need to run the corpus statement. 
+```{r}
+docs <- Corpus(VectorSource(text))
+```
+#The corpus statement actually converts it into a good structure of texts. So a corpus statement is basically a structured set of texts.The corpus is the all the tweet documents together.  
+
+##Text Cleaning: remove stop words. 
+```{r}
+gsub("https\\S*", "", press.debate$text) 
+gsub("@\\S*", "", press.debate$text) 
+gsub("amp", "", press.debate$text) 
+gsub("[\r\n]", "", press.debate$text)
+gsub("[[:punct:]]", "", press.debate$text)
+```
+#Before we can analyze it we first need to clean the data, for example, by removing any stop words, such as the, or and, or if. For this we need the packages: twitterR, and a text mining package tm.
+
+#Create a document-term-matrix
+```{r}
+dtm <- TermDocumentMatrix(docs) 
+matrix <- as.matrix(dtm) 
+words <- sort(rowSums(matrix),decreasing=TRUE) 
+df <- data.frame(word = names(words),freq=words)
+View(words)
+```
+#We create a term-matrix to make a dataframe that contains each word in the first column and their frequency in the second column for the wordcloud. We want to do this by creating a term-matrix with the TermDocumentMatrix function from the tm package.
+
+```{r}
+wordcloud(words = df$word, freq = df$freq, min.freq = 1,max.words=200, 
+          random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
+```
+#We don't look at the order, but the most frequent words are the biggest ones. Moreover, running the wordcloud without deleting the most frequent words we saw that ''the'' is the most frequent word, followed by preseidentialdebate, trump and otheres. We also detected words as ''and, for''. Now after deleting these words, we see that Trump, Donald, coronavirus, biden and words as bob and debate are most frequently used. 
+
+## Question 4. 
+#### To analyse what the sentiment is around these events, use the _syuzhet_ package to analyse the sentiment of these tweets. 
+**[Hint]** Follow the information in the Text Analysis html on Green Bonds to create a graph with the 6 different emotions using _ggplot2_ for these media events.
+
+#The sentiment analysis is conducted to create a visualization. Here we need to transpose the data to a dataframe and compute the column sum across the rows for each type of grouping variable.
+```{r}
+tweets.text <- iconv(press.debate,"WINDOWS-1252","UTF-8") #International keyboards
+sentiment <- get_nrc_sentiment(tweets.text)
+sentiment_df <- data.frame(t(sentiment))
+sentiment_df1 <- data.frame(rowSums(sentiment_df))
+
+# name rows and columns of the dataframe
+names(sentiment_df1)[1] <- "count"
+sentiment_df1 <- cbind("sentiment" = rownames(sentiment_df1), 
+sentiment_df1)
+rownames(sentiment_df1) <- NULL
+```
+
+#Now we plot the different emotions
+```{r}
+qplot(sentiment, data=sentiment_df1[1:8,], weight=count,
+geom="bar",fill=sentiment)+ggtitle("Sentiment Analysis")
+```
+#The above shown plot visualizes the prior discussed analysis. It can be seen that trust has the highest score on the sentiments, followed by fear, sadness and anger. Therefore we can say that trust has a high influence on the events of the tweets. One must also keep in mind that when reeding the tweets of these events sadness fear and anger have the highest rate for feelings. So the tweets have subjective argument. Whenever you feel directly attracted to those feelins, one can decide to not read these tweets. However, when running for electives, taking a managerial dission or for any strategy that one might have, you can analyse these tweets and stratigize on these sentiments. 
+
+#To plot only the positive and negative emotions, which are the final two rows:
+```{r}
+  qplot(sentiment, data=sentiment_df1[9:10,], weight=count,
+geom="bar",fill=sentiment)+ggtitle("Sentiment Analysis on Green Bond Tweets")
+```
+
+## Question 5. 
+#### What are the limitations of big data for managerial decision making?
+
+Big data analyses emotions, or we are trying to reveal patterns and we translate this in making decisions. To choose which product or service to introduce or where to focus ourselves in our business. Only with this type of procedure we can maintain competitive advantage through issues such as cost reduction, managers need to make sense of all this data that is out there. For limitations you need to ask yourself, what data sample did I use, is that data sample actual reflective of my consumer/client base for in the decision for a new product choice. When launching a new product does this consumer want to buy this product/service; are the type of data also representative of the consumer you want to attract with your new product/service. Only if it is reflective, the analysis will be useful. 
+_____
+
+# Deadline
+One member of each Team must upload the full assignment on Canvas by Thursday 15th October 15:00.
+
+_____
