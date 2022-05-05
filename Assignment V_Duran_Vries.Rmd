@@ -1,0 +1,392 @@
+---
+title: "Data Analytics - Assignment V"
+author: "Laura de Vries, i6225254; Hasan Duran, i6259382"
+date: "08/10/2020"
+output: 
+ html_document:
+   theme: flatly
+   toc: TRUE
+   toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE)
+```
+
+# Week 6:
+
+In this assignment, we are going to look at the crime rate data, as well as data on student's test scores.
+
+_____
+**[HINT]** You can add your answers immediately underneath the questions using this R Markdown document. After adding your answers, you can _knit_ an .html file and submit it as your completed assignment.  
+
+First of all we make sure that we are in the right working directory.
+```{r}
+getwd()
+```
+
+Afterwards the required packages are activated.
+```{r}
+library(foreign) # to be able to load in the crime data set directly from the web
+library(plm) # necessary to perform panel data regressions
+library(stargazer) # for summarizing regression output
+library(tidyverse) # for plotting and transforming data/variables
+library(ggplot2) # for further plottings
+```
+
+
+____
+# Part I
+
+For part I of the assignment, we are going to work with the crime rate data. We are going to examine the following question:
+
+#### **How does police per capita affect crime rate?**
+
+Note: crime rate (variable = crmrte) is measured as crimes committed per person.
+## Question 1.a
+#### a. Run a simple linear regression model and discuss the results
+```{r}
+#Now we open the dataset.
+crime <- read.dta("http://fmwww.bc.edu/ec-p/data/wooldridge/crime4.dta")
+#View(crime) 
+str(crime)
+head(crime)
+```
+If the file that is to be loaded appears to be a URL, the function "read.dta" downloads this data and then reads it. The variables from the dataset become columns in our data frame, while missing values are handled correctly. After a short overview it becomes clear that we are dealing with a file in long format.
+
+```{r}
+#Run the simple linear regression model ; dependent variable = crmrte ; independent variable = polpc
+regression.q1a <- lm(crmrte ~ polpc, data = crime)
+
+#Summarize the regression
+summary(regression.q1a)
+stargazer(regression.q1a, type = "text")
+```
+Considering the p-value of less than 5%, it can be said that the overal model is significant. The F-statistic is 22.21 and in connection with the multiple R^2 indicator, which shows that the model explains only 3.416% of the total variance, the model can be used, but it has only a small explanatory power.
+In the linear model we see that the police per capita has a p-value of 3.01e-06, so its significant, as well as the intercept. Due to that significance, the H0 hypothesis can be rejected.
+
+The intercept shows us that the grand mean of the crime rates over all countys and all time periods is 2.92403%. The coefficient of the variable 'polpc' shows us, the slope of the regression model, which is 1.2246078 times the polpc. If the police per capita is for example 0.001787, the estimated criminal rate would be: 0.0292403(b_0)+1.2246078(b_1)*0.001787=0.0314
+
+The positive coefficient for our variable shows at the first sight, that a higher police presence will increase the crime rates, which is obviously contradictory. Since in our regression the groups were not separated by counties or years, it is possible that in some counties the police presence is increased because the crime rate is also high. It is also possible that there were some years in which there was increased crime and accordingly the police presence was also increased in response. Thus, the result of the regression can also be seen as a response to increased crime, in which the police presence is increased in response to that.
+
+```{r}
+#Plotting the linear regression model
+ggplot(crime, aes(x=polpc, y=crmrte)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)
+```
+
+The above shown plot visualizes the prior discussed analysis. It can be seen that the crime rate is concentrated, but has deflections upwards in the concentration area, although the polpc changes only marginally. This could indicate countys with a high crime rate, in which not enough policepresence is available, if we follow this model. It is also noticeable that there are some counties with a relatively high police presence than would be expected on the basis of the crime rate. Furthermore there are only a few strong outliers.
+
+## Question 1.b
+#### b. Run a multiple linear regression model with percentage young males (variable = pctymle) as a control variable and discuss the results
+```{r}
+#Run the multiple linear regression model ; dependent variable = crmrte ; independent variable = polpc ; covariate = pctymle 
+regression.q1b <- lm(crmrte ~ polpc + pctymle, data = crime)
+
+#Summarize the regression
+summary(regression.q1b)
+stargazer(regression.q1b, type = "text")
+```
+Considering the p-value of less than 5%, it can be said that the overal model is significant. The F-statistic is 30.16 compared to the F-value of 22.21 of the simple regression. This already indicates a better fit of the model. The adjusted R^2, which shows that the model explains 8.486% of the total variance (adjusted, because additional variable was added to the model), compared to an explanatory power of 3.416% of the prior model. Although the explanatory power has increased, it is still quite low and inaccurate at just over 8%. 
+
+In the linear model we see that the police per capita has a p-value of 5.55e-07, so its significant, as well as the variable pctmyle (p-value 2.21e-09) and the intercept p-value 3.57e-07). Due to that significance, the H0 hypothesis for each variable can be rejected.
+
+The intercept shows us that the grand mean of the crime rates over all countys and all time periods is 1.3795%, if the police per capita and percentage of young males would be 0%. The coefficient of the variable 'polpc' is 1.279336, which indicates, that the higher the police per capita is, the higher is the estimated by criminal rates. The coefficient of 'polpc' has slightly changed due to the control variable 'pctymle', which has a coefficient of 0.172416. This shows, that the higher the percentage of young males is, the higher will be the estimated criminal rate, multiplicated by a factor of 0.172416. If the police per capita is for example 0.1787% and the percentage of young males is 8.76968%, the estimated criminal rate would be:
+
+0.013795(b_0) + 1.279336(b_1) x 0.001787 + 0.172416(b_2) x 0.0876968 = 3.14% 
+
+The positive coefficients for our variable shows at the first sight, that a higher police presence and higher percentage of young males, will increase the crime rates, which is only limited comprehensible. Since our sample does not differentiate between individual counties or years, the above numbers may be driven by counties with a overhang of young males. It is also possible that young men may attract other criminal groups and not be responsible for the crime rate themselves. For example, drug dealers or fraudsters may be attracted to young men because they see them as an easy business. It is therefore difficult to explain a causal relationship.
+
+## Question 1.c
+#### c. Run a fixed- and random effects panel regression model (with pctymle as a control), discuss the results.
+```{r}
+#Change data set 'crime' into a panel data and review the data set
+crime.panel <- pdata.frame(crime , 
+                           index=c("county","year"))
+View(crime.panel)
+head(crime.panel)
+```
+To perform fixed- and random effect panel regression models, the existing 'crime' file is converted into a panel frame. The parts that provide the panel structure are indicated, namely 'county' and 'year'. The individual, cross-sectional variable is 'county' and the time variable is 'year'. R now knows what the times are when we select the individual variables. Furthermore it can be seen that the values haven't changed with the crime data and the crime.panel data. However, the Row-indicator has changed, it indicates the first one which is the cross-sectional unit = country, 1 and than the time unit ('1-81' means country 1 in the year of 81).
+ 
+```{r}
+#Run the fixed effect panel regression model ; dependent variable = crmrte ; independent variable = polpc ; covariate = pctymle 
+regression.q1c.fixed <- plm(crmrte ~ polpc + pctymle , data = crime.panel , model = "within") 
+
+#Summarize the regression
+summary(regression.q1c.fixed)
+stargazer(regression.q1c.fixed, type = "text")
+```
+A fixed-effects model is a within-model since it only focuses on the variation within the cross sectional unit and we are not interested in the differences between the countries. We assume that there is an observed homogeneity across cross-sectional units. We expect an observed difference that affect crime rates, namely the countys. This result should be exactly the same as running the multiple linear model, by using dummy codes for the cross-sectional units. 
+
+The overall p-value of the model is < 2.22e-16, so its significant. Also the F-statistic of 63.5943 indicates a better fit of the model, as well as the R^2, which explains 19.121% of the variance of the model. But if we pay attention to the adjusted R^2, we only have an explanatory power of 5.4403%, which is lower than the explanatory power of the multiple linear regression. This arises doubts about the choice of the right model.
+
+The coefficients themselves show that the independent variable is significant, but the pctymle isn´t. This means that we can´t reject the H0 hypothesis for the variable 'pctymle' in our sample, as the chance is to high, that our coefficient is actually 0. In this model a higher percentage of young males actually reduces the estimated crime rate, while the variable police per capita still increases the estimated crime rate.
+
+```{r}
+#Run the random effect panel regression model ; dependent variable = crmrte ; independent variable = polpc ; covariate = pctymle 
+regression.q1c.random <- plm(crmrte ~ polpc + pctymle, data = crime.panel, model = "random")
+
+#Summarize the regression
+summary(regression.q1c.random)
+stargazer(regression.q1c.random, type = "text") # 
+```
+Next, the random-effect panel regression model is run. We do this because by each country (cross section unit) has a different intercept. But it follows a normal distribution. We change the within model to the random model. 
+
+The overall p-value of the model is < 2.22e-16, so its significant. Also the F-statistic of 128.06 indicates a better fit of the model, compared to the fixed effect panel regression. Also the R^2, which explains 16.96% of the variance of the model, but also the adjusted R^2 of 16.695%, shows that the current model has a stronger explanatory power than the fixed effect model. 
+
+We see in the regression output that police per capita seems to be positively related to crime rate with a significant p-value of 1.654. The variable pctymle is still not significant, but the p value decreased more than 50%. In the random model, this variable has also a positive coefficient, which means, that it has a positive influence on the crime rate. Although the percentage of young males variable is not significant, the model shows a robust explanatory power and it also seems significant from a sociological point of view.
+
+To decide, which model has to be choosen for the panel regression, a Hausman test needs to be done. This will be a part of the next section. We estimate, that the random model, is the model of choice.
+
+## Question 1.d
+#### d. Run a Hausman test and discuss the results and implication(s)
+```{r}
+#Run the Hausman test ; inputs: regression.q1c.fixed ; regression.q1c.random
+phtest(regression.q1c.fixed,regression.q1c.random)
+```
+Now we run a Hausman test to compare the fixed and random effect panel regression models. It actually tests whether the cross sectional unit specific effect is (un)correlated with other predictors. We include the object names of the two regressions into the 'phtest' to exermine it. The Hausman test shows that there is an insignificant p-value of 0.05466. This indicates, that the random model is the model of choice, if we had to decide, because the cross-sectional units seem to be uncorrelated with the predictors, even if its only marginal.
+
+## Question 1.e
+#### e. Run a fixed- and random effects panel regression model (with pctymle as a control), but now with police per capita in year t-3 and discuss the results
+
+To find out if the police presence per capita three years ago might have an influence on the crime rate, the lag, n=3 variable of 'polpc' will be used as an estimator. The following analysis is intended to find out the short to medium-term effects of police presence on the crime rate and to show whether increased (decreased) police presence in the past also has a positive (negative) effect on the crime rate. The lag has to be used within the plm-function, as the panel data groups the countys together. 
+
+```{r}
+#Run the fixed effect panel regression model ; dependent variable = crmrte ; independent variable = lag3_polpc ; covariate = pctymle 
+regression.q1e.fixed <- plm(crmrte ~ lag(polpc, 3) + pctymle, data = crime.panel, model = "within") 
+ 
+#Summarize the regression
+summary(regression.q1e.fixed)
+stargazer(regression.q1e.fixed, type = "text")
+```
+The overall p-value of the model is < 0.51848, so its not significant. The H0 hypothesis for this model cant be rejected. Also the F-statistic of 0.65766 indicates a bad fit of the model, as well as the R^2, which explains only 0.25% of the variance of the model. If we also pay attention to the adjusted R^2, we have a negative explanatory power of -0,16722%. This arises doubts about the choice of the right model.
+
+The coefficients themselves show that all coefficients are not significant. This means that we can´t reject the H0 hypothesis for the variable 'pctymle' in our sample, as the chance is to high, that our coefficients are actually 0.
+
+The coefficient for the effect of police per capita three years ago is negative, which indicates a statistical decrease in the crime rate, the higher the police presence was three years ago. But also the coefficient of our control variable turned negative. This makes no logical sense in the context, especially from a sociological point of view. 
+
+```{r}
+#Run the random effect panel regression model ; dependent variable = crmrte ; independent variable = lag3_polpc ; covariate = pctymle 
+regression.q1e.random <- plm(crmrte ~ pctymle + lag(polpc, 3), data = crime.panel, model = "random")
+
+#Summarize the regression
+summary(regression.q1e.random)
+stargazer(regression.q1e.random, type = "text")
+```
+The overall p-value of the model is 0.32777, so its not significant. The H0 hypothesis for this model can´t be rejected. Also the F-statistic of 2.231 indicates a bad, but at least better fit of the model to the prior model, as well as the R^2, which explains only 0.42% of the variance of the model, while the adjusted R^2 explains only 0.1%. All in all the explanatory power of this model is statistically not representative.
+
+The coefficients themselves show that both are not significant. The H0 hypothesis cant be rejected for both of them. But compared to the fixed effect panel regression model, the p values decreased. The coefficient of the police presence three years ago is negative, which means that a higher police per capita in the past, would lead to a decrease of the crime rate, which could make sense in our context. The coefficient of the percentage of young males turned positive compared to the fixed effect model and thus has a positive effect on the crime rate. In a sociological perspective, this observations may be significant, but statistically this can´t be proved.  
+
+
+## Question 1.f
+#### f. Why are the number of observations lower than in Q1.c? 
+
+We needed to shift the independent variable back in time in order to predict the dependent variable. Therefore the starting point is different as it needs the observations t-3 of the police per capita to predict the crime rate in t0. This leads to NA´s in the early years of track, which automatically reduces the number of observations. This is also called 'unbalanced panel data', because the number of observations is smaller due to the fact that each individual, can´t be observed in all time periods (number of observations < number of organizations (N) * number of time periods (T)).
+
+## Question 1.g
+#### g. Run a Hausman test and discuss the results and implication(s)
+```{r}
+#Run the Hausman test ; inputs: regression.q1e.fixed ; regression.q1e.random
+phtest(regression.q1e.fixed, regression.q1e.random)
+```
+Now we run a Hausman test to compare the fixed and random effect panel regression models, with the independent variable lag(polpc, 3) used as a predictor. The test excludes whether the fixed or random effect panel regression models are the more appropriate model for further analysis. The Hausman test shows that there is an insignificant p-value of 0.08454. This indicates, that the random model is the model of choice, if we had to decide, because the cross-sectional units seem to be uncorrelated with the predictors.
+
+## Question 1.h
+#### h. What would you recommend to a county with respect to police per capita? 
+
+We can conclude that all previously analysed regression models, except the fixed effects model where the police presence of three years ago was taken into account, all indicate that an increased number of police per capita has a positive effect on the crime rate. The model with the highest explanatory power was the fixed effects model, with an R^2 of 19.121%, although due to the many control variables involved, namely the countys, the adjusted R^2 is quite low with only 5.4403% corrected explanatory power. However, if we use the Hausman test, the fixed effects models are not the model of choice in this case anyway. In this case, the random effects model, which also includes the percentage of young males as a control variable, comes first in terms of explanatory power and quality. With an F-statistic of 128.06 and an (adjusted) R^2 of (16.6695%) 16.695%, the random effects model is the model of choice, at least between the models we have discussed. The positive effect of an increased police presence, as well as the positive effect of an increased number of young men in a county, positively influences the crime rate and can explain at least a relatively high variance of the dependent variable. Thus, the models indicate that the relationship between crime rate and police per capita, taking the percentage of young males into account, can only be explained by the model to a certain extent, which which is of course obvious in a realistic perspective. Of course, many other unexplored factors influence the crime rate of a county immensely, such as social factors like average income, unemployment rate, average education level and many more. However, if the model is interpreted, different hypotheses can be derived, which lead to either a negative or positive point of view. For example, a hypothesis that pleads for less police presence to reduce the estimated crime rate could be that increased police presence leads to civil unrest and frustration among citizens, which leads to more crime. Another hypothesis could be that the police are only deployed where they are needed. This means that the police presence in counties that already have a high crime rate for whatever reason is naturally built up as a result. This could also explain the results in our context. The interpretation possibilities are manifold. This shows us without mercy that our models do not explain causal relationships, but only give indications of how relationships could be explained. This again shows the importance of the unobservable for the explanatory power of a model.  
+
+# Part II
+
+For part II of the assignment, we are going to work with the student test results data. We are going to examine the following question:
+
+#### **How does study time affect test result?**
+Note: test scores are measured on a 0-100 scale.
+
+```{r}
+#Import Data
+results <-data.table::fread("results.csv")
+View(results)
+str(results)
+
+#Factorize the character variables
+results$Student <- as.factor(results$Student)
+results$gender <- as.factor(results$gender)
+```
+
+## Question 2.a
+#### a. Run a simple linear regression model and discuss the results
+```{r}
+#Run the simple linear regression model ; dependent variable = crmrte ; independent variable = polpc
+regression.q2a <- lm (test_grade ~ time_study, data = results)
+
+#Summarize the regression
+summary(regression.q2a)
+stargazer(regression.q2a, type = "text")
+```
+Considering the p-value of the overall model, which is 1.902e-07, it can be said that the model is significant and rejects the H0 hypothesis. The F-statistic is 157.7 and in connection with the R^2 explanatory power of 94.04% of the total variance, the model seems to have a high fit. In the linear model we see that the variable study time has a significant p-value, as well as the intercept. Due to that significance, the H0 hypothesis can be rejected for both.
+
+The intercept shows us that the grand mean of the grades over all students and tests is 39.0628. The coefficient of the variable time_study shows us, the slope of the regression model, which is 4.499 and thus positively related to the test grades. So the estimated test grade would increase by 4.4999 for each additional hour of studying. Thus, 100 points could be reached by studying (100 - 39.0628(Intercept)) / 4.4999 = 13.51 hours for the total sample, disregarding a detailed view on the students and tests themselves. In a causal context, however, this assumption is only partially accurate. Of course, the result also varies depending on the students previous knowledge, ability to learn fast and other factors. 
+
+```{r}
+ggplot(results, aes(x=time_study, y=test_grade)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)
+```
+
+This plot visualize the prior discussed outcome. It can be seen tha the study time is strongly correlated zu the test results. 
+
+## Question 2.b
+#### b. Run a multiple linear regression model with gender as a control variable, and discuss the results
+```{r}
+#Run the multiple linear regression model ; dependent variable = test_grade ; independent variable = time_study ; control variable = gender
+regression.q2b <- lm(test_grade ~ time_study + gender, data = results)
+
+#Summarize the regression
+summary(regression.q2b)
+stargazer(regression.q2b, type = "text")
+```
+The p-value of the overall model, which is 2.964e-07, is significant. In order to that the H0 hypothesis can be rejected. The F-statistic is 122.5 and is in comparison to the simple linear regression model slightly lower, which doesn´t mean that this model also shows a sufficient fit. The R^2 explains 96.46% of the total variance, whereby the adjusted R^2 shows an explanatory power of 95.67%, which is higher than the R^2 of the simple linear model. In the multiple linear regression model we see that the variable study time, as well as the gender variable has a significant p-value, and so the intercept. Due to that significance, the H0 hypothesis can be rejected for all of them.
+
+The intercept shows us that the grand mean of the grades over all students and tests is 41.069, if the gender is included as a control variable and involves only females. This intercept is slightly higher, because the other variables are kept constant or 0, which includes the control variable. So the gender 'female' has a positive effect on the intercept.  The coefficient of the variable time_study still shows us, that the slope of the regression model, which is 5.0533, is still positively related to the test grades, but a bit lower compared to the coefficient of the simple model, which is because the positive effect of the females on the slope, is now already considered in the intercept. The control variable shows a negative effect on the estimated grade for males. The effect can occur from several conditions. It is possible that males simply perform worse in tests, but the effectiveness of males studies can also be seen as another driver. If, for example, males learn longer, but write worse grades compared to their learning time, this can also have a negative effect on the estimate.  
+
+```{r}
+#Plotting the multiple linear regression model
+ggplot(results , aes(x=time_study , y = test_grade,
+                     color = gender , 
+                     shape = gender)) + geom_point() + geom_smooth(method = lm, se = FALSE , fullrange = TRUE)
+```
+The above shown plot shows the grades of female and male students, based on their invested study time. It can be seen that the number of female and male students is not equally distributed. Since each student takes three tests, we see that we have only one female student and three male students in our sample. The female student has invested much less time in learning than the male students on average. To give a causal and representative answer is difficult with such a small sample. 
+
+## Question 2.c
+#### c. Run a fixed- and random effects panel regression model (with gender as a control), and discuss the results
+```{r}
+#Panel data 
+#Change data set 'crime' into a panel data and review the data set
+results.panel <- pdata.frame(results , 
+                             index=c("Student", "test"))
+#View(results.panel)
+str(results.panel)
+head(results.panel)
+```
+To perform fixed- and random effect panel regression models, the existing 'result' file is converted into a panel frame. The parts that provide the panel structure are indicated, namely 'Student' and 'test'. 
+
+```{r}
+#Run the fixed effect panel regression model ; dependent variable = test_grade ; independent variable = time_study ; control variable = gender
+regression.q2c.fixed <- plm(test_grade ~ time_study + gender, data = results.panel, model = "within")
+
+#Summarize the regression
+summary(regression.q2c.fixed)
+stargazer(regression.q2c.fixed, type = "text") 
+```
+
+The fixed effects model allows the cross-sectional unit "Student" specific effects to be correlated with the predictors and uses the within variation, so the variation over the tests that has been taken. It makes the use of the tests demeaned, so the cross-sectional unit specific deviation from the test average values of a particular variable in this model.
+
+The overall p-value of the model is 5.5871e-07, so its significant. The H0 hypothesis for this model can be rejected. Also the F-statistic of 294.707 indicates a sufficient fit of the model, as well as the R^2, which explains about 97.68% of the variance of the model. Due to the fact that the fixed effect model includes the "Student" (cross-sectional unit) as a factor variable, we also have to pay attention to the adjusted R^2, which explains effectively 96.354% of the total variance in our model. This needs to be done, because of the model controls for individual differences, but it doesn´t show it in the output. The overall model seems to be the right choice, but this will be tested later on. 
+
+The coefficient of 'time_study' itself shows that its significant, due to the p-value of 5.587e-07. This means that we can reject the H0 hypothesis for the variable 'study_time' in our sample. With 5.476 the coefficient of the study time seems to be positively related to the estimated test grade, by assuming that there is an unobserved heterogeneity across the cross-sectional units, for example the ability to learn quick, the pre-knowledge etc. 
+
+
+```{r}
+#Run the random effect panel regression model ; dependent variable = test_grade ; independent variable = time_study ; control variable = gender
+regression.q2c.random <- plm(test_grade ~ time_study + gender, data = results.panel, model = "random")
+
+#Summarize the regression
+summary(regression.q2c.random)
+stargazer(regression.q2c.random, type = "text") 
+```
+The random effects panel regression model investigates each cross-sectional unit (Student) different intercepts, but follows a normal distribution. The overall model is significant, as its p-value is 2.22e-16, so the H0 hypothesis can be rejected. The F-statistic of 301.438 is slightly higher compared to the fixed effect model, as well as the R^2 (97.68% explanation of the models variance) and the adjusted R^2 (96.35%). But this changes are only marginal. 
+
+The coefficients of both, the study time and gender, are significant. The average test grade, keeping all other variables constant (0), is 40.56, while the study time influences the predicted outcome by 5.33 points for each additional hour of learning. The control variable shows, that our estimate has to be adjusted by 7.577 points, if a male takes the test. To reach 100 points as a male, the student has to study approximately (100-(40.56223 - 7.57701)) / 5.32969 =  12.57 hours, according our statistical model.
+
+100 - 40.56223 = 59,43777
+59,43777/5.32969 =11,15
+
+## Question 2.d
+#### d. Why does the fixed effects model omit the control variable in the output?
+
+Unfortunately, you can never be certain that you have all the relevant control variables, so if you estimate a plain vanilla OLS model, you will have to worry about unobservable factors that are correlated with the variables that you included in the regression. Omitted variable bias would result. If you believe that these unobservable factors are time-invariant, then fixed effects regression will eliminate omitted variable bias. In some cases, you might believe that your set of control variables is sufficiently rich that any unobservables are part of the regression noise, and therefore omitted variable bias is nonexistent. But you can never be certain about unobservables because, well, they are unobservable! So fixed effects models are a nice precaution even if you think you might not have a problem with omitted variable bias (FEMmodels)
+
+FE regression models eliminate omitted variable bias with respect to potentially omitted variables that do not change over time. Such time-invariant variables, like crop type or soil type, from our previous example, will be the same for each subject in our model every time it is measured. In a clinical trial, patient sex, eye color, and height (in grown adults) are all examples of time-invariant variables (Karthur).
+
+
+## Question 2.e
+#### e. Run a Hausman test and discuss the results and implication(s)
+```{r}
+#Run the Hausman test ; inputs: regression.q2c.fixed; regression.q2c.random
+phtest(regression.q2c.fixed , regression.q2c.random)
+```
+Now we run a Hausman test to compare the prior discussed fixed and random effect panel regression models. The test excludes whether the fixed or random effect panel regression models are the more appropriate model for further analysis. The Hausman test shows that there is an significant p-value of 5.343e-06. This indicates, that the fixed effects panel regression model is the model of choice, if we had to decide, because the cross-sectional units seem to be correlated with the predictors.
+
+## Question 2.f
+#### f. Show that running a multiple linear model with dummy variables for the students provides the same results as the fixed effects model, and discuss why that is the case. 
+```{r}
+#Coding of the dummy codes
+levels(results$Student)
+d1 <- c(0,1,0,0)
+d2 <- c(0,0,1,0)
+d3 <- c(0,0,0,1)
+
+#Bind the dummy codes to the variable 'Student'
+contrasts(results$Student) <- cbind(d1,d2,d3)
+results$Student
+summary(results$Student)
+```
+To show that the multiple linear model with dummy variables for the students provides the same results as the fixed effects model, we first create dummy variables and bind them to the variable 'Student'.
+
+```{r}
+##Run the multiple linear regression model ; dependent variable = test_grade ; independent variable = time_study ; covariate = Student (dummys) 
+regression.q2f.dummy <- lm(test_grade ~ time_study + Student , data = results)
+
+#Summarize the regression
+summary(regression.q2f.dummy)
+stargazer(regression.q2f.dummy, type = "text")
+
+#Disentangle the dummys
+results$Student <- factor(results$Student, ordered = F)
+```
+
+The multiple linear regression model shows that the same coefficient for the variable time_study in the outcome, as it was in the fixed effects panel regression model. This is due to the fact that the multiple linear regression model, by using dummy codes for the cross-sectional units, also allows the cross-sectional units to be correlated with the regressor. The control variable gender is excluded, as the dummys specifically take control over the cross-sectional units. The coefficient of time_study therefore investigates the unobserved differences between the students and their effects on the test grades. 
+
+```{r}
+#Boxplot of the regression.q2f.dummy
+boxplot(test_grade~Student,
+  data=results.panel,
+  main="Results of Students",
+  xlab="Students",
+  ylab="Results",
+  col="red",
+  border="black")
+```
+
+The above plot shows the results of each students in the tests, if the crossectional unit is controlled.
+
+## Question 2.g
+#### g. So apparently the PLM function runs an 'individual fixed effects model'. What if there are systematic differences in how hard these test are? What do we need to do in order to run an 'individual' ***and*** 'time' fixed effects model? Run it, and discuss the results.  
+```{r}
+#The individual and time fixed effects model. We assume that there is an observed homogeneity across cross-sectional units (we expect an observed differences). 
+regression.q2g <- plm(test_grade ~ time_study + gender , data = results.panel, model = "within" , effect = "twoways")
+
+#Summarize the regression
+summary(regression.q2g)
+stargazer(regression.q2g, type = "text")
+```
+Controlling for variables that are constant across the cross-sectional units but vary over time (tests) can be done by including time fixed effects. The combined model allows to eliminate bias from unobservables that change over the tests in our case but are constant over the students and it controls for factors that differ across students but are constant over time. 
+
+The overall p-value of the model is 4.2013e-06, so its significant. The H0 hypothesis for this model can be rejected. Also the F-statistic of 454.84, compared to an F-statistic of 294.707 in the individual fixed effects model indicates a better fit. The R^2 (98.91%), as well as the adjusted R^2 (97.61%) of our two ways model, explain in total more of the variation in our overall model, as the individual fixed effect model did. With the two ways model it was also possible to reduce the residual sum of squares (11.438), by merging the individual and time effect into one model. This indicates, that the two ways model is more precise in predicting the test grades than the fixed effect model, or any other models in our previous analysis. 
+
+The coefficient of 'time_study' itself shows that its significant, due to the p-value of 4.201e-06. This means that we can reject the H0 hypothesis for the variable 'study_time' in our sample. With 5.28246 the coefficient of the study time seems to be positively related to the estimated test grade, by eliminating systematical differences in for example how hard these test are.
+
+To summarize it can be said that based on our sample every additional hour of learning increases the test result by 5.28246 points, disregarding systematic differences of any omitted variables. 
+
+## Question 2.h
+h. What would you recommend to a student with respect to study time?
+
+If all systematic differences are to be eliminated and a recommendation is to be given to a student without presupposing any assumptions, the two ways model should be used for recommendation. Statistically this is a fairer value, in contrast to the other models, which recommended too much or too little learning time to the students, since certain bias from unobservables that change over certain conditions were eliminated. This can also be seen in the explanatory power of the two ways models, as the residual sum of squares is minimized to 11,438. Thus an average student should put 100/5.282=18.93 hours into studying in order to score 100 on a test. However, if this is transferred into reality, this recommendation represents a rigid and very statistical approach, which of course does not apply to everyone. In addition, external, incalculable factors also influence the test result, such as the professor who is to evaluate the work. If the professor does not award more than 95 points due to personal beliefs, our previous statement can be rejected, as the 100 points can never be achieved. Also the characteristics of the students always play a big role, such as current life circumstances, for example the mental and physical condition. Nevertheless, this value can be considered as a guideline and we recommend that every student take every opportunity to achieve the best possible result. Education is in our opinion an important foundation that should be built with care.
+
+# Deadline
+Students must upload the full assignment on Canvas by Thursday 8th October 15:00.
